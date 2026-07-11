@@ -26,6 +26,7 @@ struct Graph {
     int n;
     int index;
     Vertex *first;
+    Vertex *last;
 };
 
 Graph  *Graph_alloc();
