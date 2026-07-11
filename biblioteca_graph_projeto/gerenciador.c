@@ -11,13 +11,20 @@ void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *no
         return;
     }
 
-    int id;
-    char url[150];
-    char nome[100];
-
+    char linha[500]; // Buffer para ler a linha inteira do arquivo incluindo as palavras
     printf("Carregando sites do arquivo...\n");
-    // Ler linha por linha do arquivo de sites (ID, URL, Nome)
-    while (fscanf(arq_sites, "%d %s %s", &id, url, nome) != EOF) {
+    
+    // Mudamos de fscanf para fgets para pegar a linha toda com as palavras-chave
+    while (fgets(linha, sizeof(linha), arq_sites) != NULL) {
+        int id;
+        char url[150];
+        char nome[100];
+
+        // Extrai os 3 primeiros campos obrigatórios da linha lida
+        if (sscanf(linha, "%d %s %s", &id, url, nome) < 3) {
+            continue; // Pula linhas vazias ou mal formatadas
+        }
+
         // Aloca memória para a struct do Site que definimos no gerenciador.h
         Site *novo_site = (Site *)malloc(sizeof(Site));
         if (novo_site == NULL) {
@@ -33,6 +40,17 @@ void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *no
 
         // Insere o site como o valor do vértice no Grafo genérico da biblioteca
         Graph_insertVertex(g, novo_site);
+
+        // --- CONSUMINDO OS TOKENS (ID, URL, Nome) PARA CHEGAR NAS PALAVRAS ---
+        char *token = strtok(linha, " \n"); // Pega o ID
+        token = strtok(NULL, " \n");        // Pega a URL
+        token = strtok(NULL, " \n");        // Pega o Nome
+
+        // Agora, todos os próximos tokens que vierem na sequência são as palavras-chave do site!
+        token = strtok(NULL, " \n");
+        while (token != NULL) {
+            token = strtok(NULL, " \n"); // Avança para a próxima palavra da mesma linha
+        }
     }
     fclose(arq_sites);
     printf("-> %s carregado com sucesso!\n", nome_arq_sites);
