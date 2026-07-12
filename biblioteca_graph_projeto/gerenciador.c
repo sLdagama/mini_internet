@@ -41,16 +41,16 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
         novo_site->palavras = NULL;  
         novo_site->qtd_palavras = 0; 
 
-        Graph_insertVertex(g, novo_site);
+        Graph_insertVertex(g, id, novo_site);
 
         // Pega o vértice criado pra jogar no índice
         Vertex *v_site = Graph_findVertexByValue(g, url, cmp_url);
 
-        char *token = strtok(linha, " \n"); 
-        token = strtok(NULL, " \n");        
-        token = strtok(NULL, " \n");        
+        char *token = strtok(linha, " \r\n"); 
+        token = strtok(NULL, " \r\n");        
+        token = strtok(NULL, " \r\n");        
 
-        token = strtok(NULL, " \n");
+        token = strtok(NULL, " \r\n");
         while (token) {
             // Realoca o array e copia a string nova
             novo_site->palavras = realloc(novo_site->palavras, (novo_site->qtd_palavras + 1) * sizeof(char *));
@@ -63,7 +63,7 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
                 Indice_inserirPalavra(ind, token, v_site);
             }
             
-            token = strtok(NULL, " \n"); 
+            token = strtok(NULL, " \r\n"); 
         }
     }
     fclose(arq_sites);

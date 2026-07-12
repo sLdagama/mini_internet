@@ -15,12 +15,12 @@ Graph *Graph_alloc() {
     return g;
 }
 
-void Graph_insertVertex(Graph *g, void *value) {
+void Graph_insertVertex(Graph *g, int label, void *value) {
     Vertex *new = NULL;
 
       if (g) {
         new = malloc(sizeof(Vertex));
-        new->label = g->index;
+        new->label = label;
         new->value = value;
         new->n = 0;
         new->first = NULL;

@@ -46,16 +46,27 @@ void Indice_inserirPalavra(IndiceInvertido *ind, char *palavra, Vertex *v) {
         ind->qtd_palavras++;
     }
 
-    //Nova ocorrência para ligar esta palavra ao vértice do Grafo.
-    OcorrenciaNode *novaOcorrencia = malloc(sizeof(OcorrenciaNode));
-    if (!novaOcorrencia) return;
 
-    novaOcorrencia->vertex = v; 
-    
-    //Insere no início da lista de sites que contêm essa palavra
-    novaOcorrencia->next = atualWord->sites_first;
-    atualWord->sites_first = novaOcorrencia;
-    atualWord->qtd_sites++;
+    // Verificar se o site já está registrado para esta palavra
+    OcorrenciaNode *verificar = atualWord->sites_first;
+    int ja_existe = 0;
+    while (verificar) {
+        if (verificar->vertex == v) {
+            ja_existe = 1;
+            break;
+        }
+        verificar = verificar->next;
+    }
+
+    if (!ja_existe) {
+        OcorrenciaNode *novaOcorrencia = malloc(sizeof(OcorrenciaNode));
+        if (!novaOcorrencia) return;
+        novaOcorrencia->vertex = v; 
+        novaOcorrencia->next = atualWord->sites_first;
+        atualWord->sites_first = novaOcorrencia;
+        atualWord->qtd_sites++;
+    }
+
 }
 
 void Indice_removerReferenciasVertice(IndiceInvertido *ind, Vertex *v) {
@@ -307,6 +318,8 @@ Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char 
     //Quebra a string por espaços para ler palavra por palavra
     char *token = strtok(expr_copia, " \n");
 
+    int eh_primeira_palavra = 1; // Flag para controlar o início real da busca
+
     while (token != NULL) {
         if (strcmp(token, "AND") == 0) {
             operador_pendente = 1;
@@ -315,37 +328,31 @@ Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char 
             operador_pendente = 2;
         } 
         else {
-            //Se não é "AND" nem "OR", é uma palavra de busca!
             int qtd_termo = 0;
             Vertex **res_termo = Buscador_buscaSimples(ind, token, &qtd_termo);
 
-            if (operador_pendente == 0) {
-                //É a primeira palavra da consulta
+            if (eh_primeira_palavra) {
                 resultado_acumulado = res_termo;
                 qtd_acumulada = qtd_termo;
+                eh_primeira_palavra = 0; // Próximas palavras não são a primeira
             } 
-            else if (operador_pendente == 1) {
-                //Encontrou um AND
+            else if (operador_pendente == 0 || operador_pendente == 1) {
+                // Entra aqui tanto no AND explícito quanto no implícito (operador 0)
                 Vertex **novo_acumulado = Buscador_operacaoAND(resultado_acumulado, qtd_acumulada, res_termo, qtd_termo, &qtd_acumulada);
-                
                 free(resultado_acumulado);
                 free(res_termo);
-                
                 resultado_acumulado = novo_acumulado;
             } 
             else if (operador_pendente == 2) {
-                //Encontrou um OR
                 Vertex **novo_acumulado = Buscador_operacaoOR(resultado_acumulado, qtd_acumulada, res_termo, qtd_termo, &qtd_acumulada);
-                
                 free(resultado_acumulado);
                 free(res_termo);
-                
                 resultado_acumulado = novo_acumulado;
             }
             operador_pendente = 0;
         }
 
-        token = strtok(NULL, " \n"); //Avança para o próximo termo da expressão
+        token = strtok(NULL, " \r\n"); 
     }
 
     free(expr_copia);

@@ -65,7 +65,7 @@ int main() {
     // 3. REQUISITO: "realizar consultas utilizando os operadores AND e OR"
     printf("\n>>> TESTE 3: Consultas Avancadas (AND / OR)\n");
     testarBusca(grafo, indice, "codigo OR sistema"); 
-    testarBusca(grafo, indice, "linux AND terminal"); 
+    testarBusca(grafo, indice, "linux terminal"); 
 
     // 4. REQUISITO: "cadastrar novos links" e "recalcular o ranking"
     printf("\n>>> TESTE 4: Cadastro de Link e Recalculo de Ranking\n");
