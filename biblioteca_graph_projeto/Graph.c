@@ -177,6 +177,8 @@ Vertex *Graph_removeVertex(Graph *g, int label) {
         v = g->first;
 
         while (v) {
+            Vertex *vnext = v->next; // Guarda o próximo antes de mexer na estrutura
+
             if (v->label == label) {
                 e = v->first;
 
@@ -187,10 +189,10 @@ Vertex *Graph_removeVertex(Graph *g, int label) {
                 }
 
                 if (ant == NULL) {
-                    g->first = v->next;
+                    g->first = vnext;
                 }
                 else {
-                    ant->next = v->next;
+                    ant->next = vnext;
                 }
 
                 if (g->last == v) {
@@ -199,12 +201,18 @@ Vertex *Graph_removeVertex(Graph *g, int label) {
 
                 g->n--;
                 vremoved = v;
+                // Não avança o 'ant' aqui porque o 'v' atual foi deletado
             }
             else {
-                Graph_removeEdge(v, label);
+                // CORREÇÃO: Remove em loop até não restar NENHUM link duplicado
+                // e libera a memória de cada aresta removida com free()
+                Edge *removida;
+                while ((removida = Graph_removeEdge(v, label)) != NULL) {
+                    free(removida); 
+                }
+                ant = v; // Só avança o 'ant' se o vértice atual não foi removido
             }
-            ant = v;
-            v = v->next;
+            v = vnext;
         }
     }
 
