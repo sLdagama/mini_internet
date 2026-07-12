@@ -3,92 +3,129 @@
 #include <stdlib.h>
 #include <string.h>
 
-void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
-    // 1. ABRIR E LER O ARQUIVO DE SITES
+// Função auxiliar necessária para o Samuel achar o Vertex no Grafo usando a URL
+int cmp_url(void *a, void *b) {
+    Site *s = (Site *)a;
+    char *url = (char *)b;
+    return strcmp(s->url, url);
+}
+
+// CORREÇÃO: Adicionado 'IndiceInvertido *ind' nos parâmetros
+void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq_sites, const char *nome_arq_links) {
     FILE *arq_sites = fopen(nome_arq_sites, "r");
-    if (arq_sites == NULL) {
-        printf("[ERRO] Nao foi possivel abrir o arquivo de sites (%s)\n", nome_arq_sites);
+    if (!arq_sites) {
+        printf("[ERRO] Nao rolou abrir o arquivo %s\n", nome_arq_sites);
         return;
     }
 
-    char linha[500]; // Buffer para ler a linha inteira do arquivo incluindo as palavras
-    printf("Carregando sites do arquivo...\n");
+    char linha[512]; 
+    printf("Puxando sites pra memoria...\n");
     
-    // Mudamos de fscanf para fgets para pegar a linha toda com as palavras-chave
-    while (fgets(linha, sizeof(linha), arq_sites) != NULL) {
+    while (fgets(linha, sizeof(linha), arq_sites)) {
         int id;
-        char url[150];
-        char nome[100];
+        char url[150], nome[100];
 
-        // Extrai os 3 primeiros campos obrigatórios da linha lida
-        if (sscanf(linha, "%d %s %s", &id, url, nome) < 3) {
-            continue; // Pula linhas vazias ou mal formatadas
-        }
+        if (sscanf(linha, "%d %s %s", &id, url, nome) < 3) continue;
 
-        // Aloca memória para a struct do Site que definimos no gerenciador.h
         Site *novo_site = (Site *)malloc(sizeof(Site));
-        if (novo_site == NULL) {
-            printf("[ERRO] Falha de memoria ao alocar o site %s.\n", nome);
+        if (!novo_site) {
+            printf("[ERRO] Faltou RAM pro site %s.\n", nome);
             fclose(arq_sites);
             return;
         }
 
-        // Copia os dados lidos para dentro da struct do site
         strcpy(novo_site->url, url);
         strcpy(novo_site->nome, nome);
-        novo_site->importancia = 1.0; // Importância inicial padrão (Passo do Henrique depois)
+        novo_site->importancia = 1.0; 
+        novo_site->lista_palavras = NULL; 
 
-        // Insere o site como o valor do vértice no Grafo genérico da biblioteca
         Graph_insertVertex(g, novo_site);
 
-        // --- CONSUMINDO OS TOKENS (ID, URL, Nome) PARA CHEGAR NAS PALAVRAS ---
-        char *token = strtok(linha, " \n"); // Pega o ID
-        token = strtok(NULL, " \n");        // Pega a URL
-        token = strtok(NULL, " \n");        // Pega o Nome
+        // CORREÇÃO: Buscamos o ponteiro do Vertex criado para poder passar para o seu índice
+        Vertex *v_site = Graph_findVertexByValue(g, url, cmp_url);
 
-        // Agora, todos os próximos tokens que vierem na sequência são as palavras-chave do site!
+        char *token = strtok(linha, " \n"); 
+        token = strtok(NULL, " \n");        
+        token = strtok(NULL, " \n");        
+
         token = strtok(NULL, " \n");
-        while (token != NULL) {
-            token = strtok(NULL, " \n"); // Avança para a próxima palavra da mesma linha
+        while (token) {
+            PalavraNode *nova_palavra = (PalavraNode *)malloc(sizeof(PalavraNode));
+            if (nova_palavra) {
+                strcpy(nova_palavra->palavra, token);
+                nova_palavra->prox = novo_site->lista_palavras;
+                novo_site->lista_palavras = nova_palavra;
+
+                // CORREÇÃO: Alimenta o seu índice dinamicamente
+                if (ind && v_site) {
+                    Indice_inserirPalavra(ind, token, v_site);
+                }
+            }
+            token = strtok(NULL, " \n"); 
         }
     }
     fclose(arq_sites);
-    printf("-> %s carregado com sucesso!\n", nome_arq_sites);
 
-    // 2. ABRIR E LER O ARQUIVO DE LINKS
     FILE *arq_links = fopen(nome_arq_links, "r");
-    if (arq_links == NULL) {
-        printf("[ERRO] Nao foi possivel abrir o arquivo de links (%s)\n", nome_arq_links);
+    if (!arq_links) {
+        printf("[ERRO] Nao rolou abrir o arquivo %s\n", nome_arq_links);
         return;
     }
 
-    int id_origem, id_destino;
-
-    printf("Conectando links entre os sites...\n");
-    // Ler linha por linha do arquivo de links (ID_Origem, ID_Destino)
-    while (fscanf(arq_links, "%d %d", &id_origem, &id_destino) != EOF) {
-        // Insere a aresta direcionada ligando os dois vértices pelos seus IDs
-        // Como a biblioteca pede um dado para a aresta e nao precisamos, passamos NULL
-        Graph_insertEdge(g, id_origem, id_destino, NULL);
+    int orig, dest;
+    printf("Montando as arestas (links)...\n");
+    while (fscanf(arq_links, "%d %d", &orig, &dest) == 2) {
+        Graph_insertEdge(g, orig, dest, NULL);
     }
     fclose(arq_links);
-    printf("-> %s carregado com sucesso!\n", nome_arq_links);
-    printf("[SUCESSO] Toda a base de dados foi carregada no Grafo!\n");
-}
+    
+    // CORREÇÃO: Roda o seu ranking inicial logo após ler toda a estrutura
+    Buscador_recalcularRanking(g);
 
-void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
-    // Código de salvar arquivos (vamos implementar quando o projeto avançar)
+    printf("[SUCESSO] Base de dados totalmente carregada no Grafo!\n");
 }
 
 void Buscador_cadastrarLink(Graph *g, int id_origem, int id_destino) {
-    // Insere um novo link quando o usuário usar o menu
     Graph_insertEdge(g, id_origem, id_destino, NULL);
+    // CORREÇÃO: Recalcula o ranking após inserção
+    Buscador_recalcularRanking(g); 
 }
 
 void Buscador_removerLink(Graph *g, int id_origem, int id_destino) {
-    // Código de remover link (próximas semanas)
+    Vertex *v_origem = Graph_findVertexByLabel(g, id_origem);
+    if (v_origem) {
+        Edge *aresta_removida = Graph_removeEdge(v_origem, id_destino);
+        if (aresta_removida) {
+            free(aresta_removida);
+            // CORREÇÃO: Recalcula o ranking após remoção de link
+            Buscador_recalcularRanking(g); 
+        }
+    }
 }
 
-void Buscador_removerSite(Graph *g, int id_site) {
-    // Código de remover site (próximas semanas)
+// CORREÇÃO: Adicionado 'IndiceInvertido *ind' para limpar as referências com segurança
+void Buscador_removerSite(Graph *g, IndiceInvertido *ind, int id_site) {
+    Vertex *v_removido = Graph_removeVertex(g, id_site);
+    
+    if (v_removido) {
+        // CORREÇÃO: Limpa o site do seu índice ANTES de dar free na memória
+        if (ind) {
+            Indice_removerReferenciasVertice(ind, v_removido);
+        }
+
+        Site *site = (Site *)v_removido->value;
+        if (site) {
+            PalavraNode *atual = site->lista_palavras;
+            while (atual) {
+                PalavraNode *prox = atual->prox;
+                free(atual); 
+                atual = prox;
+            }
+            free(site); 
+        }
+        free(v_removido); 
+        
+        // CORREÇÃO: Recalcula o ranking já que links que iam para este site sumiram
+        Buscador_recalcularRanking(g); 
+    }
 }

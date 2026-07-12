@@ -2,18 +2,13 @@
 #define GERENCIADOR_H
 
 #include "Graph.h"
+#include "mecanismo_busca.h"
 
-typedef struct {
-    char url[150];
-    char nome[100];
-    double importancia; // Peso/Ranking calculado pelas arestas que chegam
-} Site;
-
-void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links);
+void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq_sites, const char *nome_arq_links);
 void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links);
 
 void Buscador_cadastrarLink(Graph *g, int id_origem, int id_destino);
 void Buscador_removerLink(Graph *g, int id_origem, int id_destino);
-void Buscador_removerSite(Graph *g, int id_site);
+void Buscador_removerSite(Graph *g, IndiceInvertido *ind, int id_site);
 
 #endif
