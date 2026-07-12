@@ -36,12 +36,12 @@ void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *no
         // Copia os dados lidos para dentro da struct do site
         strcpy(novo_site->url, url);
         strcpy(novo_site->nome, nome);
-        novo_site->importancia = 1.0; // Importância inicial padrão (Passo do Henrique depois)
+        novo_site->importancia = 1.0; // Importância inicial padrão 
+        novo_site->lista_palavras = NULL; // Inicializa a lista encadeada VAZIA
 
         // Insere o site como o valor do vértice no Grafo genérico da biblioteca
         Graph_insertVertex(g, novo_site);
 
-        // --- CONSUMINDO OS TOKENS (ID, URL, Nome) PARA CHEGAR NAS PALAVRAS ---
         char *token = strtok(linha, " \n"); // Pega o ID
         token = strtok(NULL, " \n");        // Pega a URL
         token = strtok(NULL, " \n");        // Pega o Nome
@@ -49,6 +49,16 @@ void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *no
         // Agora, todos os próximos tokens que vierem na sequência são as palavras-chave do site!
         token = strtok(NULL, " \n");
         while (token != NULL) {
+            // Cria um novo nó para a palavra de forma dinâmica
+            PalavraNode *nova_palavra = (PalavraNode *)malloc(sizeof(PalavraNode));
+            if (nova_palavra != NULL) {
+                strcpy(nova_palavra->palavra, token);
+                
+                // Insere a palavra no INÍCIO da lista encadeada do site
+                nova_palavra->prox = novo_site->lista_palavras;
+                novo_site->lista_palavras = nova_palavra;
+            }
+            
             token = strtok(NULL, " \n"); // Avança para a próxima palavra da mesma linha
         }
     }
