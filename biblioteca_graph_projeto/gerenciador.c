@@ -4,101 +4,151 @@
 #include <string.h>
 
 void Buscador_carregarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
-    // 1. ABRIR E LER O ARQUIVO DE SITES
     FILE *arq_sites = fopen(nome_arq_sites, "r");
-    if (arq_sites == NULL) {
-        printf("[ERRO] Nao foi possivel abrir o arquivo de sites (%s)\n", nome_arq_sites);
+    if (!arq_sites) {
+        printf("[ERRO] Nao rolou abrir o arquivo %s\n", nome_arq_sites);
         return;
     }
 
-    char linha[500]; // Buffer para ler a linha inteira do arquivo incluindo as palavras
-    printf("Carregando sites do arquivo...\n");
+    char linha[512]; 
+    printf("Puxando sites pra memoria...\n");
     
-    // Mudamos de fscanf para fgets para pegar a linha toda com as palavras-chave
-    while (fgets(linha, sizeof(linha), arq_sites) != NULL) {
+    while (fgets(linha, sizeof(linha), arq_sites)) {
         int id;
-        char url[150];
-        char nome[100];
+        char url[150], nome[100];
 
-        // Extrai os 3 primeiros campos obrigatórios da linha lida
-        if (sscanf(linha, "%d %s %s", &id, url, nome) < 3) {
-            continue; // Pula linhas vazias ou mal formatadas
-        }
+        // Se a linha vier mal formatada, ignora e segue a vida
+        if (sscanf(linha, "%d %s %s", &id, url, nome) < 3) continue;
 
-        // Aloca memória para a struct do Site que definimos no gerenciador.h
         Site *novo_site = (Site *)malloc(sizeof(Site));
-        if (novo_site == NULL) {
-            printf("[ERRO] Falha de memoria ao alocar o site %s.\n", nome);
+        if (!novo_site) {
+            printf("[ERRO] Faltou RAM pro site %s.\n", nome);
             fclose(arq_sites);
             return;
         }
 
-        // Copia os dados lidos para dentro da struct do site
         strcpy(novo_site->url, url);
         strcpy(novo_site->nome, nome);
-        novo_site->importancia = 1.0; // Importância inicial padrão 
-        novo_site->lista_palavras = NULL; // Inicializa a lista encadeada VAZIA
+        novo_site->importancia = 1.0; 
+        novo_site->lista_palavras = NULL; 
 
-        // Insere o site como o valor do vértice no Grafo genérico da biblioteca
+        // Insere o vértice. A biblioteca Graph.c já cria o ID sequencial certinho.
         Graph_insertVertex(g, novo_site);
 
-        char *token = strtok(linha, " \n"); // Pega o ID
-        token = strtok(NULL, " \n");        // Pega a URL
-        token = strtok(NULL, " \n");        // Pega o Nome
+        // Pulando ID, URL e Nome pra chegar nas palavras-chave da linha
+        char *token = strtok(linha, " \n"); 
+        token = strtok(NULL, " \n");        
+        token = strtok(NULL, " \n");        
 
-        // Agora, todos os próximos tokens que vierem na sequência são as palavras-chave do site!
         token = strtok(NULL, " \n");
-        while (token != NULL) {
-            // Cria um novo nó para a palavra de forma dinâmica
+        while (token) {
             PalavraNode *nova_palavra = (PalavraNode *)malloc(sizeof(PalavraNode));
-            if (nova_palavra != NULL) {
+            if (nova_palavra) {
                 strcpy(nova_palavra->palavra, token);
-                
-                // Insere a palavra no INÍCIO da lista encadeada do site
+                // Insere no início da lista (O(1))
                 nova_palavra->prox = novo_site->lista_palavras;
                 novo_site->lista_palavras = nova_palavra;
             }
-            
-            token = strtok(NULL, " \n"); // Avança para a próxima palavra da mesma linha
+            token = strtok(NULL, " \n"); 
         }
     }
     fclose(arq_sites);
-    printf("-> %s carregado com sucesso!\n", nome_arq_sites);
 
-    // 2. ABRIR E LER O ARQUIVO DE LINKS
     FILE *arq_links = fopen(nome_arq_links, "r");
-    if (arq_links == NULL) {
-        printf("[ERRO] Nao foi possivel abrir o arquivo de links (%s)\n", nome_arq_links);
+    if (!arq_links) {
+        printf("[ERRO] Nao rolou abrir o arquivo %s\n", nome_arq_links);
         return;
     }
 
-    int id_origem, id_destino;
-
-    printf("Conectando links entre os sites...\n");
-    // Ler linha por linha do arquivo de links (ID_Origem, ID_Destino)
-    while (fscanf(arq_links, "%d %d", &id_origem, &id_destino) != EOF) {
-        // Insere a aresta direcionada ligando os dois vértices pelos seus IDs
-        // Como a biblioteca pede um dado para a aresta e nao precisamos, passamos NULL
-        Graph_insertEdge(g, id_origem, id_destino, NULL);
+    int orig, dest;
+    printf("Montando as arestas (links)...\n");
+    while (fscanf(arq_links, "%d %d", &orig, &dest) == 2) {
+        // Usa a função exata da biblioteca do projeto
+        Graph_insertEdge(g, orig, dest, NULL);
     }
     fclose(arq_links);
-    printf("-> %s carregado com sucesso!\n", nome_arq_links);
-    printf("[SUCESSO] Toda a base de dados foi carregada no Grafo!\n");
+    
+    printf("[SUCESSO] Base de dados totalmente carregada no Grafo!\n");
 }
 
 void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
-    // Código de salvar arquivos (vamos implementar quando o projeto avançar)
+    if (!g) return;
+
+    FILE *arq_sites = fopen(nome_arq_sites, "w");
+    FILE *arq_links = fopen(nome_arq_links, "w");
+
+    if (!arq_sites || !arq_links) {
+        printf("[ERRO] Problema ao abrir arquivos pra escrita.\n");
+        if(arq_sites) fclose(arq_sites);
+        if(arq_links) fclose(arq_links);
+        return;
+    }
+
+    // 1. Salvar os Sites e as Palavras varrendo a lista de vértices do Graph.h
+    Vertex *v = g->first;
+    while (v) {
+        Site *site = (Site *)v->value;
+        if (site) {
+            fprintf(arq_sites, "%d %s %s", v->label, site->url, site->nome);
+            
+            // Grava as palavras na mesma linha
+            PalavraNode *atual = site->lista_palavras;
+            while (atual) {
+                fprintf(arq_sites, " %s", atual->palavra);
+                atual = atual->prox;
+            }
+            fprintf(arq_sites, "\n");
+        }
+        v = v->next; // Pula pro próximo vértice
+    }
+
+    // 2. Salvar os Links varrendo as arestas do Graph.h
+    v = g->first;
+    while (v) {
+        Edge *e = v->first;
+        while (e) {
+            fprintf(arq_links, "%d %d\n", v->label, e->head->label);
+            e = e->next; // Pula pra próxima aresta
+        }
+        v = v->next;
+    }
+
+    fclose(arq_sites);
+    fclose(arq_links);
+    printf("[SUCESSO] Persistencia concluida! Arquivos atualizados.\n");
 }
 
 void Buscador_cadastrarLink(Graph *g, int id_origem, int id_destino) {
-    // Insere um novo link quando o usuário usar o menu
     Graph_insertEdge(g, id_origem, id_destino, NULL);
 }
 
 void Buscador_removerLink(Graph *g, int id_origem, int id_destino) {
-    // Código de remover link (próximas semanas)
+    // Na biblioteca do Graph.h, remover aresta pede o ponteiro do Vértice de origem
+    Vertex *v_origem = Graph_findVertexByLabel(g, id_origem);
+    if (v_origem) {
+        Edge *aresta_removida = Graph_removeEdge(v_origem, id_destino);
+        if (aresta_removida) {
+            free(aresta_removida); // Libera a memória da aresta removida
+        }
+    }
 }
 
 void Buscador_removerSite(Graph *g, int id_site) {
-    // Código de remover site (próximas semanas)
+    // Graph_removeVertex desvincula o vértice, mas retorna ele pra gente limpar a sujeira
+    Vertex *v_removido = Graph_removeVertex(g, id_site);
+    
+    if (v_removido) {
+        Site *site = (Site *)v_removido->value;
+        if (site) {
+            // Limpa as palavras-chave primeiro pra evitar vazamento
+            PalavraNode *atual = site->lista_palavras;
+            while (atual) {
+                PalavraNode *prox = atual->prox;
+                free(atual); 
+                atual = prox;
+            }
+            free(site); // Libera a struct do Site
+        }
+        free(v_removido); // Libera a struct do Vértice que a biblioteca desvinculou
+    }
 }
