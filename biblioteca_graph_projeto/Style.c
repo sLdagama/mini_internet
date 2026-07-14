@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include "desing.h"
+#include "Style.h"
 
-// Centraliza uma frase para printá-la
+// Função auxiliar que centraliza uma frase para printá-la
 void printCentralizado(char *c){
     int w = Clic_getScreenWidth(), tamanho;
     tamanho = strlen(c);
@@ -13,7 +13,7 @@ void printCentralizado(char *c){
 }
 
 // Lê o arquivo .txt que contém a arte ASCII da interface inicial
-void interfaceInicial(){
+void Style_interfaceInicial(){
     Clic_clearScreen();
     char arq[] = "interface_inicial.txt";
     FILE *f = fopen(arq, "r");
@@ -30,8 +30,14 @@ void interfaceInicial(){
     }
 }
 
+void Style_printBox(){
+    int w = Clic_getScreenWidth();
+    int h = Clic_getScreenHeight();
+    Clic_printBox(w, h);
+}
+
 // Mostra o menu e retorna o respectivo número da opção selecionada
-int mostraMenu(){
+int Style_mostraMenu(){
     int linha = 0, tecla;
     char *menu[6] = {"Cadastrar site",
                      "Cadastrar link",
@@ -45,12 +51,25 @@ int mostraMenu(){
     // o seu fundo será vermelho.
     do{
         Clic_clearScreen();
+        Style_printBox();
+        Clic_move(10, 20);
+        printf("█   █ █████ █   █ █   █ ");
+        Clic_move(11, 20);
+        printf("██ ██ █     ██  █ █   █ ");
+        Clic_move(12, 20);
+        printf("█ █ █ ████  █ █ █ █   █ ");
+        Clic_move(13, 20);
+        printf("█   █ █     █  ██ █   █ ");
+        Clic_move(14, 20);
+        printf("█   █ █████ █   █  ███  ");
         for(int i = 0; i < 6; i++){
             if(i == linha){
                 Clic_setBackgroundColor(Color_GREEN);
+                Clic_setFontColor(Color_BLACK);
             }
             if((linha == 4)&&(i == 4)){
                 Clic_setBackgroundColor(Color_RED);
+                Clic_setFontColor(Color_BLACK);
             }
             Clic_move(20 + i, 20);
             printf("%s\n", menu[i]);
@@ -64,4 +83,12 @@ int mostraMenu(){
         }
     } while(tecla != Key_ENTER);
     return linha;
+}
+
+char *Style_input(){
+    int w = Clic_getScreenWidth();
+    int h = Clic_getScreenHeight();
+    Clic_move(2, w/2);
+    Clic_printBox(w/2, 5);
+    Clic_keyCapture();
 }

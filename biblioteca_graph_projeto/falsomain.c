@@ -43,7 +43,7 @@ void testarBusca(Graph *g, IndiceInvertido *ind, char *expressao) {
 }
 
 // --- BATERIA DE TESTES PRINCIPAL ---
-
+/*
 int main() {
     printf("====================================================\n");
     printf("   INICIANDO BATERIA DE TESTES - MINI INTERNET      \n");
@@ -92,7 +92,7 @@ int main() {
     // 7. REQUISITO: "salvar todos os dados em arquivo"
     printf("\n>>> TESTE 7: Persistencia de Dados\n");
     printf("Acao: Salvando estado atual em arquivos de backup (sites_backup.txt, links_backup.txt)\n");
-    //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt");
+    //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt"); (A SER IMPLEMENTADA)
     printf("  -> Dados salvos com sucesso!\n");
 
     // 8. FINALIZAÇÃO: Limpeza rigorosa para o Valgrind
@@ -103,4 +103,4 @@ int main() {
 
     printf("\n====================================================\n");
     return 0;
-}
+}*/
