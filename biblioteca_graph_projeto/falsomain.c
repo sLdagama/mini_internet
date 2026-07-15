@@ -23,24 +23,7 @@ void mostrarRankingGeral(Graph *g) {
 }
 
 // Verifica os requisitos: "pesquisar uma palavra", "mais de uma palavra" e "operadores AND e OR"
-void testarBusca(Graph *g, IndiceInvertido *ind, char *expressao) {
-    printf("\n[BUSCA] Expressao: '%s'\n", expressao);
-    int qtd = 0;
-    
-    // Supondo que a sua função completa já chame internamente a buscaSimples, AND ou OR
-    Vertex **resultados = Buscador_realizarConsultaCompleta(g, ind, expressao, &qtd);
-    
-    if (resultados && qtd > 0) {
-        for (int i = 0; i < qtd; i++) {
-            Site *s = (Site *)resultados[i]->value;
-            // Verifica o requisito de ordenação por importância
-            printf("  %d. %s (PageRank: %.2f)\n", i + 1, s->nome, s->importancia);
-        }
-        free(resultados); // Evita vazamento de memória do array retornado
-    } else {
-        printf("  -> Nenhum resultado encontrado para esta pesquisa.\n");
-    }
-}
+
 
 // --- BATERIA DE TESTES PRINCIPAL ---
 /*
@@ -92,7 +75,7 @@ int main() {
     // 7. REQUISITO: "salvar todos os dados em arquivo"
     printf("\n>>> TESTE 7: Persistencia de Dados\n");
     printf("Acao: Salvando estado atual em arquivos de backup (sites_backup.txt, links_backup.txt)\n");
-    //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt"); (A SER IMPLEMENTADA)
+    //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt");
     printf("  -> Dados salvos com sucesso!\n");
 
     // 8. FINALIZAÇÃO: Limpeza rigorosa para o Valgrind

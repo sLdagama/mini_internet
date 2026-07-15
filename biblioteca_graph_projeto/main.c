@@ -7,8 +7,10 @@
 #include "Style.h"
 
 
+
 int main(){
     int option;
+    char userAnswer[1000];
     Graph *grafo = Graph_alloc();
     IndiceInvertido *indice = Indice_alloc();
 
@@ -20,20 +22,25 @@ int main(){
         option = Style_mostraMenu();
         if(option == 0){
             //CADASTRAR SITE
-            Style_input();
+            
+            Style_input(option, userAnswer);
         } else if(option == 1){
             //CADASTRAR LINK
 
+            Style_input(option, userAnswer);
         } else if(option == 2){
             //REMOVER SITE
 
+            Style_input(option, userAnswer);
         } else if(option == 3){
             //PESQUISAR
 
+            Style_input(option, userAnswer);
+            Buscador_printSites(grafo, indice, userAnswer); 
         } else if(option == 4){
             //SAIR
 
-            // 7° REQUISITO: SALVAR TODOS OS DADOS EM UM ARQUIVO (EM FASE DE IMPLEMENTAÇÃO)
+            // 7° REQUISITO: SALVAR TODOS OS DADOS EM UM ARQUIVO
             //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt"); 
 
             break;
