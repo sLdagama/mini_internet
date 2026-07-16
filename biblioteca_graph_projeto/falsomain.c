@@ -5,45 +5,8 @@
 #include "gerenciador.h"
 #include "mecanismo_busca.h"
 
-// --- FUNÇÕES AUXILIARES PARA VERIFICAÇÃO VISUAL NO TERMINAL ---
-
-// Verifica o requisito: "calcular a importância de cada site" e "recalcular o ranking após inserção/remoção"
-void mostrarRankingGeral(Graph *g) {
-    printf("\n[RANKING ATUAL DOS SITES]\n");
-    Vertex *v = g->first;
-    if (!v) {
-        printf("  O grafo esta vazio!\n");
-        return;
-    }
-    while (v) {
-        Site *s = (Site *)v->value;
-        printf("  ID: %d | Site: %-15s | Importancia: %.2f\n", v->label, s->nome, s->importancia);
-        v = v->next;
-    }
-}
-
-// Verifica os requisitos: "pesquisar uma palavra", "mais de uma palavra" e "operadores AND e OR"
-void testarBusca(Graph *g, IndiceInvertido *ind, char *expressao) {
-    printf("\n[BUSCA] Expressao: '%s'\n", expressao);
-    int qtd = 0;
-    
-    // Supondo que a sua função completa já chame internamente a buscaSimples, AND ou OR
-    Vertex **resultados = Buscador_realizarConsultaCompleta(g, ind, expressao, &qtd);
-    
-    if (resultados && qtd > 0) {
-        for (int i = 0; i < qtd; i++) {
-            Site *s = (Site *)resultados[i]->value;
-            // Verifica o requisito de ordenação por importância
-            printf("  %d. %s (PageRank: %.2f)\n", i + 1, s->nome, s->importancia);
-        }
-        free(resultados); // Evita vazamento de memória do array retornado
-    } else {
-        printf("  -> Nenhum resultado encontrado para esta pesquisa.\n");
-    }
-}
-
 // --- BATERIA DE TESTES PRINCIPAL ---
-
+/*
 int main() {
     printf("====================================================\n");
     printf("   INICIANDO BATERIA DE TESTES - MINI INTERNET      \n");
@@ -103,4 +66,4 @@ int main() {
 
     printf("\n====================================================\n");
     return 0;
-}
+}*/
