@@ -9,56 +9,63 @@
 int main(){
     int option;
     int id_origem, id_destino, id_site;
-    char userAnswer[1000];
+    char userAnswer[1000], userAnswer2[1000];
     Graph *grafo = Graph_alloc();
     IndiceInvertido *indice = Indice_alloc();
  
-    //CARREGA UMA MINIATURA DA INTERNET PREVIAMENTE SALVA
+    //CARREGA UMA MINIATURA DA MINI_INTERNET PREVIAMENTE SALVA
     Buscador_carregarDados(grafo, indice, "sites.txt", "links.txt");
 
     Style_interfaceInicial();
     while(1){
-        option = Style_mostraMenu();
-        if(option == 0){
-            //CADASTRAR SITE (?)(usuário fornece uma string)
-            
-        } else if(option == 1){
-            //CADASTRAR PALAVRA-CHAVE (?)(usuário fornece uma string)
+        option = Style_showMenu();
+        if(option == 1){
+            //CADASTRAR SITE
 
+            Style_input(option * NOT_FINISHED, &id_site, Say_IDsite);
+            Style_input(option * NOT_FINISHED, userAnswer, Say_URLsite);
+            Style_input(option, userAnswer2, Say_NAMEsite);
+            Buscador_cadastrarSite(grafo, id_site, userAnswer, userAnswer2);
         } else if(option == 2){
+            //CADASTRAR PALAVRA-CHAVE
+
+            Style_input(option * NOT_FINISHED, &id_site, Say_IDsite);
+            Style_input(option, userAnswer, Say_keyWord);
+            Buscador_cadastrarPalavra(grafo, indice, id_site, userAnswer);
+        } else if(option == 3){
             //CADASTRAR LINK 
 
-            Style_inputInt(-option, &id_origem);
-            Style_inputInt(option, &id_destino);
+            Style_input(option * NOT_FINISHED, &id_origem, Say_originID);
+            Style_input(option, &id_destino, Say_destinyID);
             Buscador_cadastrarLink(grafo, id_origem, id_destino);
-        } else if(option == 3){
+        } else if(option == 4){
             //REMOVER SITE 
 
-            Style_inputInt(option, &id_site);
+            Style_input(option, &id_site, Say_removeID);
             Buscador_removerSite(grafo, indice, id_site);
-        } else if(option == 4){
+        } else if(option == 5){
             //REMOVER LINK 
 
-            Style_inputInt(-option, &id_origem);
-            Style_inputInt(option, &id_destino);
+            Style_input(option * NOT_FINISHED, &id_origem, Say_originID);
+            Style_input(option, &id_destino, Say_destinyID);
             Buscador_removerLink(grafo, id_origem, id_destino);
-        } else if(option == 5){
+        } else if(option == 6){
             //PESQUISAR
 
-            Style_inputChar(option, userAnswer);
+            Style_input(option, userAnswer, Say_search);
             Clic_clearScreen();
             Buscador_printSites(grafo, indice, userAnswer);
             Clic_keyCapture();
-        } else if(option == 6){
+        } else if(option == 7){
             //SAIR
 
-            //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt"); 
+            Buscador_salvarDados(grafo, "sites.txt", "links.txt"); 
             break;
         } else {
-            //MOSTRA O GRAFO E O ID DOS GRAFOS
+            //MOSTRA O ID DOS GRAFOS
             
             Clic_clearScreen();
-            Style_mostraRank(grafo);
+            Style_showRank(grafo);
             Clic_keyCapture();
         }
     }
