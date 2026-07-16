@@ -86,6 +86,82 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
     printf("[SUCESSO] Base de dados totalmente carregada no Grafo!\n");
 }
 
+void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
+    FILE *f_sites = fopen(nome_arq_sites, "w");
+    FILE *f_links = fopen(nome_arq_links, "w");
+
+    if (!f_sites || !f_links) {
+        printf("[ERRO] Nao foi possivel abrir os arquivos para salvar.\n");
+        if(f_sites) fclose(f_sites);
+        if(f_links) fclose(f_links);
+        return;
+    }
+
+    Vertex *v = g->first;
+    while (v) {
+        Site *s = (Site *)v->value;
+        // Salva: ID URL Nome
+        fprintf(f_sites, "%d %s %s", v->label, s->url, s->nome);
+        
+        // Salva as palavras na mesma linha
+        for (int i = 0; i < s->qtd_palavras; i++) {
+            fprintf(f_sites, " %s", s->palavras[i]);
+        }
+        fprintf(f_sites, "\n");
+
+        // Salva as arestas (links) deste vértice
+        Edge *e = v->first;
+        while (e) {
+            if (e->head) {
+                fprintf(f_links, "%d %d\n", v->label, e->head->label);
+            }
+            e = e->next;
+        }
+        v = v->next;
+    }
+
+    fclose(f_sites);
+    fclose(f_links);
+}
+
+void Buscador_cadastrarSite(Graph *g, int id, const char *url, const char *nome) {
+    Site *novo_site = (Site *)malloc(sizeof(Site));
+    if (!novo_site) {
+        printf("[ERRO] Falta de memoria ao cadastrar site.\n");
+        return;
+    }
+
+    strcpy(novo_site->url, url);
+    strcpy(novo_site->nome, nome);
+    novo_site->importancia = 1.0; 
+    novo_site->palavras = NULL;  
+    novo_site->qtd_palavras = 0; 
+
+    Graph_insertVertex(g, id, novo_site);
+}
+
+void Buscador_cadastrarPalavra(Graph *g, IndiceInvertido *ind, int id_site, const char *palavra) {
+    Vertex *v_site = Graph_findVertexByLabel(g, id_site);
+    if (!v_site) {
+        printf("[ERRO] Site ID %d nao encontrado.\n", id_site);
+        return;
+    }
+
+    Site *site = (Site *)v_site->value;
+    
+    // Aumenta o array de palavras
+    site->palavras = realloc(site->palavras, (site->qtd_palavras + 1) * sizeof(char *));
+    site->palavras[site->qtd_palavras] = malloc(strlen(palavra) + 1);
+    strcpy(site->palavras[site->qtd_palavras], palavra);
+    
+    site->qtd_palavras++; 
+
+    // Insere no índice invertido para a busca funcionar
+    if (ind) {
+        Indice_inserirPalavra(ind, (char *)palavra, v_site);
+    }
+}
+
 void Buscador_cadastrarLink(Graph *g, int id_origem, int id_destino) {
     Graph_insertEdge(g, id_origem, id_destino, NULL);
     Buscador_recalcularRanking(g); 
@@ -125,4 +201,3 @@ void Buscador_removerSite(Graph *g, IndiceInvertido *ind, int id_site) {
         Buscador_recalcularRanking(g); 
     }
 }
-
