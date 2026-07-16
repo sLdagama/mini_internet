@@ -6,8 +6,6 @@
 #include "gerenciador.h"
 #include "Style.h"
 
-
-
 int main(){
     int option;
     char userAnswer[1000];
@@ -21,23 +19,27 @@ int main(){
     while(1){
         option = Style_mostraMenu();
         if(option == 0){
-            //CADASTRAR SITE
+            //CADASTRAR SITE (?)
             
-            Style_input(option, userAnswer);
         } else if(option == 1){
-            //CADASTRAR LINK
+            //CADASTRAR PALAVRA-CHAVE (?)
 
-            Style_input(option, userAnswer);
         } else if(option == 2){
-            //REMOVER SITE
+            //CADASTRAR LINK (usuário fornece dois números inteiros)
 
-            Style_input(option, userAnswer);
         } else if(option == 3){
-            //PESQUISAR
+            //REMOVER SITE (usuário fornece um número inteiro)
 
-            Style_input(option, userAnswer);
-            Buscador_printSites(grafo, indice, userAnswer); 
         } else if(option == 4){
+            //REMOVER LINK (remove link a partir de dois números inteiros)
+            
+        } else if(option == 5){
+            //PESQUISAR
+            Style_inputChar(option, userAnswer);
+            Clic_clearScreen();
+            Buscador_printSites(grafo, indice, userAnswer);
+            Clic_keyCapture();
+        } else if(option == 6){
             //SAIR
 
             // 7° REQUISITO: SALVAR TODOS OS DADOS EM UM ARQUIVO
@@ -45,8 +47,10 @@ int main(){
 
             break;
         } else {
-            //(TEMPORÁRIO) MOSTRA GRAFO
-
+            //MOSTRA O GRAFO E O ID DOS GRAFOS
+            Clic_clearScreen();
+            Graph_print(grafo);
+            Clic_keyCapture();
         }
     }
     Graph_free(grafo);

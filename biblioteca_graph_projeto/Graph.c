@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "Graph.h"
 #include "Queue.h"
+
 Graph *Graph_alloc() {
     Graph *g = malloc(sizeof(Graph));
 

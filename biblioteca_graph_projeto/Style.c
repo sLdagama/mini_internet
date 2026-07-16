@@ -36,12 +36,14 @@ void Style_printBox(){
 // Mostra o menu e retorna o respectivo número da opção selecionada
 int Style_mostraMenu(){
     int linha = 0, tecla;
-    char *menu[6] = {"Cadastrar site",
+    char *menu[8] = {"Cadastrar site",
+                     "Cadastrar palavra-chave",
                      "Cadastrar link",
                      "Remover site",
+                     "Remover link",
                      "Pesquisar",
                      "Sair",
-                     "*Mostrar grafo"}; // ÚLTIMA OPÇÃO É TEMPORÁRIA
+                     "Mostrar grafo"};
 
     // Aqui está o menu propriamente dito, se a linha selecionada é uma
     // qualquer, o seu fundo será verde. Mas, se for a opção "sair",
@@ -59,12 +61,12 @@ int Style_mostraMenu(){
         printf("█   █ █     █  ██ █   █ ");
         Clic_move(14, 20);
         printf("█   █ █████ █   █  ███  ");
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < 8; i++){
             if(i == linha){
                 Clic_setBackgroundColor(Color_GREEN);
                 Clic_setFontColor(Color_BLACK);
             }
-            if((linha == 4)&&(i == 4)){
+            if((linha == 6)&&(i == 6)){
                 Clic_setBackgroundColor(Color_RED);
                 Clic_setFontColor(Color_BLACK);
             }
@@ -73,7 +75,7 @@ int Style_mostraMenu(){
             Clic_resetColor();
         }
         tecla = Clic_keyCapture();
-        if((tecla == Key_DOWN)&&(linha < 6)){
+        if((tecla == Key_DOWN)&&(linha < 7)){
             linha++;
         } else if((tecla == Key_UP)&&(linha > 0)){
             linha--;
@@ -83,7 +85,7 @@ int Style_mostraMenu(){
 }
 
 // Printa uma caixa de entrada customizada para cada opção e obtém a resposta do usuário
-void Style_input(int option, char *userAnswer){
+void Style_inputChar(int option, char *userAnswer){
     int w = Clic_getScreenWidth();
     int h = Clic_getScreenHeight();
     char temporaryAnswer[1000];
@@ -93,15 +95,7 @@ void Style_input(int option, char *userAnswer){
 
     // Para cada opção, será mostrado uma frase diferente, conforme o que for solicitado
     Clic_move((h*0.7)-1, w*0.27);
-    if(option == 0){
-        printf("Insira o site que deseja cadastrar");
-    } else if(option == 1){
-        printf("Insira os sites que deseja linkar");
-    } else if(option == 2){
-        printf("Insira o site que deseja remover");
-    } else if(option == 3){
-        printf("Realize sua pesquisa");
-    }
+    Stype_customMessage(option);
 
     // Printa a caixa de input
     Clic_move(h*0.7, w*0.27);
@@ -126,7 +120,7 @@ void Style_input(int option, char *userAnswer){
     // Retorno visual final
     Clic_move(h*0.7 + 6, 6);
     Clic_pause(1.5);
-    if(option != 3){
+    if(option != 5){
         Clic_setFontColor(Color_GREEN);
         Clic_printCenter(text2);
     } else {
@@ -138,6 +132,22 @@ void Style_input(int option, char *userAnswer){
     // Ajustes finais necessários
     Clic_resetColor();
     Style_cleanBuffer();
+}
+
+void Stype_customMessage(int option){
+    if(option == 0){
+        printf("Insira o site que deseja cadastrar");
+    } else if(option == 1){
+        printf(" "); //cadastro de palavra chave
+    } else if(option == 2){
+        printf(" "); //cadastro de link
+    } else if(option == 3){
+        printf(" "); //remoção de site
+    } else if(option == 4){
+        printf(" "); //remoção de link
+    } else if(option == 5){
+        printf("Realize sua consulta"); //realizar consulta
+    }
 }
 
 //void Style_executionVerification();
