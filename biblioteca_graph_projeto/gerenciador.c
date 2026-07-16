@@ -125,3 +125,4 @@ void Buscador_removerSite(Graph *g, IndiceInvertido *ind, int id_site) {
         Buscador_recalcularRanking(g); 
     }
 }
+
