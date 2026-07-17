@@ -4,8 +4,8 @@
 #include "Graph.h"
 #include "mecanismo_busca.h"
 
-#define MAX_OPTIONS 8  // total de índices no vetor de strings do menu
-#define LEAVE_OPTION 7 // respectivo índice do vetor (para saída) somado a 1; index = i + 1
+#define MAX_OPTIONS 9  // total de índices no vetor de strings do menu
+#define LEAVE_OPTION 9 // respectivo índice do vetor (para saída) somado a 1; index = i + 1
 #define SEARCH_OPTION 6 // respectivo índice do vetor (para consulta/pesquisa) somado a 1; index = i + 1
 #define NOT_FINISHED -1
 
@@ -38,5 +38,5 @@ void Style_input(int option, void *userAnswer, Say Say);
 // Printa o id do site, o nome do site e o seu atual valor de importância (função adaptada para essa biblioteca)
 void Style_showRank(Graph *g);
 
-// Verifica se a tela possui tamanho ideal para execução do código
-//int Style_executionVerification();
+// Verifica se a tela possui tamanho ideal para execução do código (garante uma exebição agradável dos elementos visuais)
+int Style_executionVerify();

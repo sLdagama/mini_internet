@@ -15,7 +15,7 @@ void Style_customMessage(Say Say){
                             break;
         case Say_URLsite:   printf("Insira a URL do site"); 
                             break;
-        case Say_NAMEsite:  printf("Insira o DNS do site"); 
+        case Say_NAMEsite:  printf("Insira o nome do site"); 
                             break;
         case Say_keyWord:   printf("Insira a palavra que deseja cadastrar"); 
                             break;
@@ -63,8 +63,9 @@ int Style_showMenu(){
                                "Remover site",
                                "Remover link",
                                "Pesquisar",
-                               "Sair",
-                               "Mostrar rank"};
+                               "*Mostrar links",
+                               "Mostrar ranks",
+                               "Sair",};
 
     /* Aqui está o menu propriamente dito, se a linha selecionada é uma
      * qualquer, o seu fundo será verde. Mas, se for a opção "sair",
@@ -197,4 +198,23 @@ void Style_showRank(Graph *g) {
     }
 }
 
-//int Style_executionVerification();
+int Style_executionVerify(){
+    int w = Clic_getScreenWidth();
+    int h = Clic_getScreenHeight();
+
+    Clic_clearScreen();
+    if((w < 168)||(h < 44)){
+        printf("Proporção da sua tela: %d x %d\n", w, h);
+        printf("Proporção ideal: 168 x 44...\n");
+        printf("\nAjuste a proporção da sua tela e pressione qualquer botão para verificar novamente");
+        Clic_showCursor();
+        Clic_keyCapture();
+        Clic_setFontColor(Color_YELLOW);
+        printf("\n\nVerificando...");
+        Clic_resetColor();
+        Clic_pause(1);
+        return 0;
+    } else {
+        return 1;
+    }
+}

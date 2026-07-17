@@ -7,12 +7,20 @@
 #include "Style.h"
 
 int main(){
-    int option;
+    int option, verify;
     int id_origem, id_destino, id_site;
     char userAnswer[1000], userAnswer2[1000];
     Graph *grafo = Graph_alloc();
     IndiceInvertido *indice = Indice_alloc();
  
+    // Garante uma exibição agradável
+    while(1){
+        verify = Style_executionVerify();
+        if(verify == 1){
+            break;
+        }
+    }
+
     //CARREGA UMA MINIATURA DA MINI_INTERNET PREVIAMENTE SALVA
     Buscador_carregarDados(grafo, indice, "sites.txt", "links.txt");
 
@@ -57,16 +65,20 @@ int main(){
             Buscador_printSites(grafo, indice, userAnswer);
             Clic_keyCapture();
         } else if(option == 7){
-            //SAIR
+            // MOSTRA OS LINKS ENTRE OS SITES
 
-            Buscador_salvarDados(grafo, "sites.txt", "links.txt"); 
-            break;
-        } else {
-            //MOSTRA O ID DOS GRAFOS
+            // (a ser implementada)
+        } else if(option == 8){
+            // MOSTRA O ID DE CADA SITE, O SEU NOME E SUA IMPORTÂNCIA
             
             Clic_clearScreen();
             Style_showRank(grafo);
             Clic_keyCapture();
+        } else {
+            // SAIR
+
+            Buscador_salvarDados(grafo, "sites.txt", "links.txt"); 
+            break;
         }
     }
     Graph_free(grafo);
