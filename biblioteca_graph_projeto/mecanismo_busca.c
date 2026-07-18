@@ -380,22 +380,3 @@ int Buscador_compararSites(const void *a, const void *b) {
     //Se as importâncias forem iguais ordena por ordem alfabática
     return strcmp(siteA->nome, siteB->nome);
 }
-
-void Buscador_printSites(Graph *g, IndiceInvertido *ind, char *expressao) {
-    printf("\n[BUSCA] Expressao: '%s'\n", expressao);
-    int qtd = 0;
-    
-    // Supondo que a sua função completa já chame internamente a buscaSimples, AND ou OR
-    Vertex **resultados = Buscador_realizarConsultaCompleta(g, ind, expressao, &qtd);
-    
-    if (resultados && qtd > 0) {
-        for (int i = 0; i < qtd; i++) {
-            Site *s = (Site *)resultados[i]->value;
-            // Verifica o requisito de ordenação por importância
-            printf("  %d. %s (PageRank: %.2f)\n", i + 1, s->nome, s->importancia);
-        }
-        free(resultados); // Evita vazamento de memória do array retornado
-    } else {
-        printf("  -> Nenhum resultado encontrado para esta pesquisa.\n");
-    }
-}

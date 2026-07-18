@@ -21,6 +21,8 @@ int main(){
         }
     }
 
+    Style_startProgram();
+
     //CARREGA UMA MINIATURA DA MINI_INTERNET PREVIAMENTE SALVA
     Buscador_carregarDados(grafo, indice, "sites.txt", "links.txt");
 
@@ -61,23 +63,20 @@ int main(){
             //PESQUISAR
 
             Style_input(option, userAnswer, Say_search);
-            Clic_clearScreen();
-            Buscador_printSites(grafo, indice, userAnswer);
-            Clic_keyCapture();
+            Style_searchResult(grafo, indice, userAnswer);
         } else if(option == 7){
             // MOSTRA OS LINKS ENTRE OS SITES
 
-            // (a ser implementada)
+            Style_showLinks(grafo);
         } else if(option == 8){
             // MOSTRA O ID DE CADA SITE, O SEU NOME E SUA IMPORTÂNCIA
             
-            Clic_clearScreen();
             Style_showRank(grafo);
-            Clic_keyCapture();
         } else {
             // SAIR
 
-            Buscador_salvarDados(grafo, "sites.txt", "links.txt"); 
+            Buscador_salvarDados(grafo, "sites.txt", "links.txt");
+            Clic_showCursor();
             break;
         }
     }

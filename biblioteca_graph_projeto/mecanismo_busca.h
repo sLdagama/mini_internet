@@ -67,7 +67,4 @@ int Buscador_compararSites(const void *a, const void *b);
 //Processa uma string vê se tem AND ou OR para chamar as funções acima e retorna um vetor de vertex* ordernado
 Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char *expressao, int *qtd_final);
 
-// Encontra os sites que possuem a expressão desejada e retorna para a tela
-void Buscador_printSites(Graph *g, IndiceInvertido *ind, char *expressao);
-
 #endif 

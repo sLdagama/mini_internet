@@ -4,10 +4,11 @@
 #include "Graph.h"
 #include "mecanismo_busca.h"
 
-#define MAX_OPTIONS 9  // total de índices no vetor de strings do menu
-#define LEAVE_OPTION 9 // respectivo índice do vetor (para saída) somado a 1; index = i + 1
-#define SEARCH_OPTION 6 // respectivo índice do vetor (para consulta/pesquisa) somado a 1; index = i + 1
-#define NOT_FINISHED -1
+#define MAX_OPTIONS    9  // total de índices no vetor de strings do menu
+#define LEAVE_OPTION   9  // respectivo índice do vetor (para saída) somado a 1; index = i + 1
+#define SEARCH_OPTION  6  // respectivo índice do vetor (para consulta/pesquisa) somado a 1; index = i + 1
+#define NOT_FINISHED  -1
+#define FINISHED       1
 
 typedef enum Say{
     // Discrimina uma variável do tipo inteiro
@@ -23,9 +24,6 @@ typedef enum Say{
     Say_search    = 7,
 }Say;
 
-// Printa uma caixa do tamanho da tela (cria as bordas)
-void Style_printBox();
-
 // Imprime a arte da interface inicial
 void Style_interfaceInicial();
 
@@ -35,8 +33,17 @@ int Style_showMenu();
 // Printa uma caixa de input e recebe a resposta do usuário (ideal para resposta em formato de string)
 void Style_input(int option, void *userAnswer, Say Say);
 
+// Verifica se a tela possui tamanho ideal para execução do código (garante uma exebição agradável dos elementos visuais)
+int Style_executionVerify();
+
+// Animação inicial de inicialização
+void Style_startProgram();
+
+// Mostra os links
+void Style_showLinks();
+
 // Printa o id do site, o nome do site e o seu atual valor de importância (função adaptada para essa biblioteca)
 void Style_showRank(Graph *g);
 
-// Verifica se a tela possui tamanho ideal para execução do código (garante uma exebição agradável dos elementos visuais)
-int Style_executionVerify();
+// Encontra os sites que possuem a expressão desejada e retorna para a tela
+void Style_searchResult(Graph *g, IndiceInvertido *ind, char *expressao);
