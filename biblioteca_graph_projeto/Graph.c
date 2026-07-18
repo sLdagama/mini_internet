@@ -46,15 +46,15 @@ void Graph_print(Graph *g) {
     Edge *e;
 
     if (g) {
-        printf("Graph(%d)\n", g->n);
+        printf(" [ID DO SITE] | [LINKS]\n");
         
         v = g->first;
         while (v) {
-            printf(" %d/ ", v->label);
+            printf(" %7d%6s|", v->label, "");
 
             e = v->first;
             while(e) {
-                printf("%d ", e->head->label);
+                printf(" %d ", e->head->label);
                 e = e->next;
             }
             printf("\n");

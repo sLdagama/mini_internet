@@ -7,59 +7,77 @@
 #include "Style.h"
 
 int main(){
-    int option;
+    int option, verify;
     int id_origem, id_destino, id_site;
-    char userAnswer[1000];
+    char userAnswer[1000], userAnswer2[1000];
     Graph *grafo = Graph_alloc();
     IndiceInvertido *indice = Indice_alloc();
  
-    //CARREGA UMA MINIATURA DA INTERNET PREVIAMENTE SALVA
+    // Garante uma exibição agradável
+    while(1){
+        verify = Style_executionVerify();
+        if(verify == 1){
+            break;
+        }
+    }
+
+    Style_startProgram();
+
+    //CARREGA UMA MINIATURA DA MINI_INTERNET PREVIAMENTE SALVA
     Buscador_carregarDados(grafo, indice, "sites.txt", "links.txt");
 
     Style_interfaceInicial();
     while(1){
-        option = Style_mostraMenu();
-        if(option == 0){
-            //CADASTRAR SITE (?)(usuário fornece uma string)
-            
-        } else if(option == 1){
-            //CADASTRAR PALAVRA-CHAVE (?)(usuário fornece uma string)
+        option = Style_showMenu();
+        if(option == 1){
+            //CADASTRAR SITE
 
+            Style_input(option * NOT_FINISHED, &id_site, Say_IDsite);
+            Style_input(option * NOT_FINISHED, userAnswer, Say_URLsite);
+            Style_input(option, userAnswer2, Say_NAMEsite);
+            Buscador_cadastrarSite(grafo, id_site, userAnswer, userAnswer2);
         } else if(option == 2){
+            //CADASTRAR PALAVRA-CHAVE
+
+            Style_input(option * NOT_FINISHED, &id_site, Say_IDsite);
+            Style_input(option, userAnswer, Say_keyWord);
+            Buscador_cadastrarPalavra(grafo, indice, id_site, userAnswer);
+        } else if(option == 3){
             //CADASTRAR LINK 
 
-            Style_inputInt(-option, &id_origem);
-            Style_inputInt(option, &id_destino);
+            Style_input(option * NOT_FINISHED, &id_origem, Say_originID);
+            Style_input(option, &id_destino, Say_destinyID);
             Buscador_cadastrarLink(grafo, id_origem, id_destino);
-        } else if(option == 3){
+        } else if(option == 4){
             //REMOVER SITE 
 
-            Style_inputInt(option, &id_site);
+            Style_input(option, &id_site, Say_removeID);
             Buscador_removerSite(grafo, indice, id_site);
-        } else if(option == 4){
+        } else if(option == 5){
             //REMOVER LINK 
 
-            Style_inputInt(-option, &id_origem);
-            Style_inputInt(option, &id_destino);
+            Style_input(option * NOT_FINISHED, &id_origem, Say_originID);
+            Style_input(option, &id_destino, Say_destinyID);
             Buscador_removerLink(grafo, id_origem, id_destino);
-        } else if(option == 5){
+        } else if(option == 6){
             //PESQUISAR
 
-            Style_inputChar(option, userAnswer);
-            Clic_clearScreen();
-            Buscador_printSites(grafo, indice, userAnswer);
-            Clic_keyCapture();
-        } else if(option == 6){
-            //SAIR
+            Style_input(option, userAnswer, Say_search);
+            Style_searchResult(grafo, indice, userAnswer);
+        } else if(option == 7){
+            // MOSTRA OS LINKS ENTRE OS SITES
 
-            //Buscador_salvarDados(grafo, "sites_backup.txt", "links_backup.txt"); 
-            break;
-        } else {
-            //MOSTRA O GRAFO E O ID DOS GRAFOS
+            Style_showLinks(grafo);
+        } else if(option == 8){
+            // MOSTRA O ID DE CADA SITE, O SEU NOME E SUA IMPORTÂNCIA
             
-            Clic_clearScreen();
-            Style_mostraRank(grafo);
-            Clic_keyCapture();
+            Style_showRank(grafo);
+        } else {
+            // SAIR
+
+            Buscador_salvarDados(grafo, "sites.txt", "links.txt");
+            Clic_showCursor();
+            break;
         }
     }
     Graph_free(grafo);

@@ -18,7 +18,7 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
     }
 
     char linha[512]; 
-    printf("Puxando sites pra memoria...\n");
+    //printf("Puxando sites pra memoria...\n");
     
     while (fgets(linha, sizeof(linha), arq_sites)) {
         int id;
@@ -75,7 +75,7 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
     }
 
     int orig, dest;
-    printf("Montando as arestas (links)...\n");
+    // printf("Montando as arestas (links)...\n");
     while (fscanf(arq_links, "%d %d", &orig, &dest) == 2) {
         Graph_insertEdge(g, orig, dest, NULL);
     }
@@ -83,7 +83,7 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
     
     Buscador_recalcularRanking(g);
 
-    printf("[SUCESSO] Base de dados totalmente carregada no Grafo!\n");
+    // printf("[SUCESSO] Base de dados totalmente carregada no Grafo!\n");
 }
 
 void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
