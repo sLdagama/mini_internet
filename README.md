@@ -2,7 +2,7 @@
 
 ## Sobre o projeto
 
-O presente projeto foi desenvolvido como requisito para obtenção da nota referente a AP3 do componente curricular "Estrutura de Dados", usa o Tipo Abstrado de Dado (TAD) [Grafo](https://github.com/sLdagama/mini_internet/blob/main/biblioteca_graph_projeto/Graph.c) ativamente em sua implementação e, para a criação de efeitos visuais, foi-se usada a biblioteca [Clic](https://github.com/sLdagama/mini_internet/blob/main/biblioteca_graph_projeto/Clic.c).
+O presente projeto foi desenvolvido como requisito para obtenção da nota referente à AP3 do componente curricular "Estrutura de Dados", usa o Tipo Abstrato de Dado (TAD) [Grafo](https://github.com/sLdagama/mini_internet/blob/main/biblioteca_graph_projeto/Graph.c) ativamente em sua implementação e, para a criação de efeitos visuais, foi-se usada a biblioteca [Clic](https://github.com/sLdagama/mini_internet/blob/main/biblioteca_graph_projeto/Clic.c).
 
 > [!IMPORTANT]
 > Para uma execução agradável do código, é necessário que o terminal tenha, pelo menos, uma proporção de 168 x 44.
