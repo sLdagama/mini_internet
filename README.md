@@ -31,7 +31,7 @@ Para gerar o arquivo executável, faça:
 gcc *c
 ```
 
-Após gerar o execuável, faça:
+Após gerar o executável, faça:
 
 ```
 ./a.out
