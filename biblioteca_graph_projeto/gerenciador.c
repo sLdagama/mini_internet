@@ -138,6 +138,7 @@ void Buscador_cadastrarSite(Graph *g, int id, const char *url, const char *nome)
     novo_site->qtd_palavras = 0; 
 
     Graph_insertVertex(g, id, novo_site);
+    Buscador_recalcularRanking(g);
 }
 
 void Buscador_cadastrarPalavra(Graph *g, IndiceInvertido *ind, int id_site, const char *palavra) {
