@@ -8,7 +8,8 @@ typedef struct {
     char url[150];
     char nome[100];
     double importancia;
-    
+    double peso;
+
     char **palavras;     
     int qtd_palavras;    
 } Site;
@@ -47,6 +48,10 @@ void Indice_removerReferenciasVertice(IndiceInvertido *ind, Vertex *v);
 
 void Indice_free(IndiceInvertido *ind);
 
+
+//Gera o próximo id de um site
+int Buscador_gerarProximoID(Graph *g);
+
 //Percorre o grafo todo e soma o número de de arestas que chegam em vertice para determinar a importância do site
 void Buscador_recalcularRanking(Graph *g);
 
@@ -66,5 +71,7 @@ int Buscador_compararSites(const void *a, const void *b);
 
 //Processa uma string vê se tem AND ou OR para chamar as funções acima e retorna um vetor de vertex* ordernado
 Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char *expressao, int *qtd_final);
+
+void string_para_minusculo(char *str);
 
 #endif 

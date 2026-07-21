@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mecanismo_busca.h"
-
+#include <ctype.h>
 
 IndiceInvertido *Indice_alloc() {
     IndiceInvertido *ind = malloc(sizeof(IndiceInvertido));
@@ -129,43 +129,65 @@ void Indice_free(IndiceInvertido *ind) {
     free(ind); //Limpa o índice invertido
 }
 
+int Buscador_gerarProximoID(Graph *g) {
+    if (!g || !g->first) {
+        return 0; // Se o grafo estiver completamente vazio, o primeiro ID é 1
+    }
 
-
-void Buscador_recalcularRanking(Graph *g) {
-    if (!g) return;
-
+    int maior_id = 0;
     Vertex *v = g->first;
-    
-    //Zera a importância de todos os sites do grafo
+
+    // Varre o grafo inteiro procurando o maior número de ID (label) atual
     while (v) {
-        Site *site = (Site *)v->value;
-        if (site) {
-            site->importancia = 0.0;
+        if (v->label > maior_id) {
+            maior_id = v->label;
         }
         v = v->next;
     }
 
-    
+    return maior_id + 1; // O próximo ID será o maior encontrado + 1
+}
+
+void Buscador_recalcularRanking(Graph *g) {
+    if (!g || g->n == 0) return;
+
+    int tam_vetor = g->index + 1; 
+    double *novas_importancias = (double *)calloc(tam_vetor, sizeof(double));
+    if (!novas_importancias) return;
+
+    // 1. Percorre todos os vértices do grafo
     Vertex *w = g->first;
-    //Percorre cada vértice 'w' pra ver as arestas que saem dele
     while (w) {
-        Edge *e = w->first;
+        Site *site_origem = (Site *)w->value;
         
-        // Percorre todas as arestas que saem de 'w'
-        while (e) {
-            Vertex *destino = e->head;
-            
-            if (destino) {
-                Site *site_destino = (Site *)destino->value;
-                if (site_destino) {
-                    //Soma o valor da aresta na importância do destino.
-                    site_destino->importancia += 1.0; 
+        if (site_origem) {
+            // O valor transmitido é o peso fixo de indicação do site de origem!
+            int peso_a_transmitir = site_origem->peso;
+
+            Edge *e = w->first;
+            while (e) {
+                Vertex *destino = e->head;
+                if (destino) {
+                    // O destino recebe o peso_indicacao da origem
+                    novas_importancias[destino->label] += peso_a_transmitir;
                 }
+                e = e->next;
             }
-            e = e->next;
         }
         w = w->next;
     }
+
+    // 2. Atualiza a importância acumulada de cada site
+    Vertex *v = g->first;
+    while (v) {
+        Site *site = (Site *)v->value;
+        if (site) {
+            site->importancia = novas_importancias[v->label];
+        }
+        v = v->next;
+    }
+
+    free(novas_importancias);
 }
 
 
@@ -308,7 +330,8 @@ Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char 
     }
 
     char *expr_copia = strdup(expressao);
-    
+    string_para_minusculo(expr_copia);
+
     Vertex **resultado_acumulado = NULL;
     int qtd_acumulada = 0;
 
@@ -316,15 +339,15 @@ Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char 
     int operador_pendente = 0; 
 
     //Quebra a string por espaços para ler palavra por palavra
-    char *token = strtok(expr_copia, " \n");
+    char *token = strtok(expr_copia, " \t\r\n\n");
 
     int eh_primeira_palavra = 1; // Flag para controlar o início real da busca
 
     while (token != NULL) {
-        if (strcmp(token, "AND") == 0) {
+        if (strcmp(token, "and") == 0) {
             operador_pendente = 1;
         } 
-        else if (strcmp(token, "OR") == 0) {
+        else if (strcmp(token, "or") == 0) {
             operador_pendente = 2;
         } 
         else {
@@ -352,7 +375,7 @@ Vertex **Buscador_realizarConsultaCompleta(Graph *g, IndiceInvertido *ind, char 
             operador_pendente = 0;
         }
 
-        token = strtok(NULL, " \r\n"); 
+        token = strtok(NULL, " \t\r\n"); 
     }
 
     free(expr_copia);
@@ -379,4 +402,11 @@ int Buscador_compararSites(const void *a, const void *b) {
 
     //Se as importâncias forem iguais ordena por ordem alfabática
     return strcmp(siteA->nome, siteB->nome);
+}
+
+// Função auxiliar para converter string para minúsculo de forma segura
+void string_para_minusculo(char *str) {
+    for (int i = 0; str[i]; i++) {
+        str[i] = tolower((unsigned char)str[i]);
+    }
 }

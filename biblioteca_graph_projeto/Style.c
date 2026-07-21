@@ -27,6 +27,8 @@ void Style_customMessage(Say Say){
                             break;
         case Say_search:    printf("Realize sua consulta"); 
                             break;
+        case Say_PESOsite:  printf("Insira o peso da aresta do site"); 
+                            break;                    
     }
 }
 
@@ -162,6 +164,7 @@ void Style_input(int option, void *userAnswer, Say Say){
     char temporaryAnswer[1000];
     char *charAnswer = NULL;
     int *intAnswer = NULL;
+    double *doubleAnswer = NULL;
 
     // Para cada opção, será mostrado uma frase diferente, conforme o que for solicitado
     Clic_move((h*0.7)-1, w*0.27);
@@ -183,7 +186,10 @@ void Style_input(int option, void *userAnswer, Say Say){
      * caso contrário, é uma variável char.
      */
     Clic_showCursor();
-    if(Say < 4){
+    if(Say == Say_PESOsite) {
+        doubleAnswer = userAnswer;
+        scanf("%lf", doubleAnswer);
+    } else if(Say < 4) {
         intAnswer = userAnswer; 
         scanf("%d", intAnswer);
     } else {
