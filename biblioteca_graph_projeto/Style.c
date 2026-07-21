@@ -183,19 +183,20 @@ void Style_input(int option, void *userAnswer, Say Say){
     /* Note que a variável "Say" serve como fator discriminante para saber se estamos
      * lidando com uma variável do tipo int ou char. Veja no arquivo "Style.h" o tipo
      * "Say" que criamos, note que dos valores 0 ao 3, se referem a uma variável int,
-     * caso contrário, é uma variável char.
+     * os valores de 4 a 7 se referem a uma variável char. Caso não seja int nem char,
+     * é uma variável do tipo float.
      */
     Clic_showCursor();
-    if(Say == Say_PESOsite) {
-        doubleAnswer = userAnswer;
-        scanf("%lf", doubleAnswer);
-    } else if(Say < 4) {
+    if(Say < 4) {
         intAnswer = userAnswer; 
         scanf("%d", intAnswer);
-    } else {
+    } else if (Say < 8){
         charAnswer = userAnswer;
         scanf("%[^\n]", temporaryAnswer);
         strcpy(charAnswer, temporaryAnswer);
+    } else {
+        doubleAnswer = userAnswer;
+        scanf("%lf", doubleAnswer);
     }
     Clic_hideCursor();
 
@@ -319,7 +320,7 @@ void Style_searchResult(Graph *g, IndiceInvertido *ind, char *expressao) {
             Site *s = (Site *)resultados[i]->value;
 
             // Os resultados saem seguindo uma ordem de importância
-            printf("  %d. %s (Importância: %.2f)\n", i + 1, s->nome, s->importancia);
+            printf("  %d. %s (Importância: %.2f)\n", i + 1, s->url, s->importancia);
         }
         free(resultados); // Evita vazamento de memória do array retornado
     } else {
