@@ -35,7 +35,6 @@ int main(){
             Style_input(option * NOT_FINISHED, userAnswer, Say_URLsite);
             Style_input(option * NOT_FINISHED, userAnswer2, Say_NAMEsite);
             Style_input(option, &peso, Say_PESOsite);
-            
 
             int id_site = Buscador_gerarProximoID(grafo);
             Buscador_cadastrarSite(grafo, indice, id_site, userAnswer, userAnswer2, peso);
