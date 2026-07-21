@@ -22,6 +22,8 @@ typedef enum Say{
     Say_NAMEsite  = 5,
     Say_keyWord   = 6,
     Say_search    = 7,
+
+    // Discrimina uma variável do tipo float
     Say_PESOsite  = 8,
 }Say;
 
