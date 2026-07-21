@@ -1,3 +1,10 @@
-0 www.google.com Google 1 pesquisa buscador internet
-1 www.github.com GitHub 1 codigo repositorio programacao
-2 www.popos.org PopOS 1 sistema linux terminal
+0 www.google.com Google 10 pesquisa buscador internet busca ferramentas web
+1 www.github.com GitHub 9 codigo repositorio programacao git software desenvolvimento projetos
+2 www.popos.org PopOS 6 sistema linux terminal operacional software sistemaoperacional
+3 www.stackoverflow.com StackOverflow 9 programacao duvidas codigo desenvolvimento software suporte comunidade
+4 www.youtube.com Youtube 8 videos entretenimento streaming tutorial midia conteudo
+5 www.wikipedia.org Wikipedia 8 enciclopedia conhecimento artigos informacao pesquisa historia
+6 www.reddit.com Reddit 7 comunidade forum discussao noticias conteudo redesocial
+7 www.w3schools.com W3Schools 7 tutorial programacao desenvolvimento web html css javascript
+8 www.geeksforgeeks.org GeeksForGeeks 8 estruturasdedados algoritmos programacao ciencia computacao tutorial
+9 www.archlinux.org ArchLinux 5 sistema linux terminal distribuicao codigoaberto
