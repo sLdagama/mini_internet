@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 // Auxiliar pra achar vértice por URL
 int cmp_url(void *a, void *b) {
     Site *s = (Site *)a;
@@ -18,13 +19,14 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
     }
 
     char linha[512]; 
-    //printf("Puxando sites pra memoria...\n");
     
     while (fgets(linha, sizeof(linha), arq_sites)) {
         int id;
         char url[150], nome[100];
+        double peso = 1.0;
 
-        if (sscanf(linha, "%d %s %s", &id, url, nome) < 3) continue;
+        // Agora exige 4 campos: id url nome peso
+        if (sscanf(linha, "%d %s %s %lf", &id, url, nome, &peso) < 4) continue;
 
         Site *novo_site = (Site *)malloc(sizeof(Site));
         if (!novo_site) {
@@ -35,24 +37,36 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
 
         strcpy(novo_site->url, url);
         strcpy(novo_site->nome, nome);
-        novo_site->importancia = 1.0; 
+        novo_site->importancia = 0.0;   // vai ser recalculada de qualquer forma
+        novo_site->peso = peso;         // <- agora inicializado corretamente!
         
-        // Array de palavras da struct do Henrique
         novo_site->palavras = NULL;  
         novo_site->qtd_palavras = 0; 
 
         Graph_insertVertex(g, id, novo_site);
 
-        // Pega o vértice criado pra jogar no índice
         Vertex *v_site = Graph_findVertexByValue(g, url, cmp_url);
 
-        char *token = strtok(linha, " \r\n"); 
-        token = strtok(NULL, " \r\n");        
-        token = strtok(NULL, " \r\n");        
+        if (ind && v_site) {
+            char termo_nome[100], termo_url[150];
+            strcpy(termo_nome, nome);
+            strcpy(termo_url, url);
 
-        token = strtok(NULL, " \r\n");
+            string_para_minusculo(termo_nome);
+            string_para_minusculo(termo_url);
+
+            Indice_inserirPalavra(ind, termo_nome, v_site);
+            Indice_inserirPalavra(ind, termo_url, v_site);
+        }
+
+        // Pula id, url, nome E peso antes de começar a ler as palavras
+        char *token = strtok(linha, " \r\n"); // id
+        token = strtok(NULL, " \r\n");        // url
+        token = strtok(NULL, " \r\n");        // nome
+        token = strtok(NULL, " \r\n");        // peso  <-- pulo novo
+
+        token = strtok(NULL, " \r\n");        // primeira palavra-chave
         while (token) {
-            // Realoca o array e copia a string nova
             novo_site->palavras = realloc(novo_site->palavras, (novo_site->qtd_palavras + 1) * sizeof(char *));
             novo_site->palavras[novo_site->qtd_palavras] = malloc(strlen(token) + 1);
             strcpy(novo_site->palavras[novo_site->qtd_palavras], token);
@@ -75,15 +89,12 @@ void Buscador_carregarDados(Graph *g, IndiceInvertido *ind, const char *nome_arq
     }
 
     int orig, dest;
-    // printf("Montando as arestas (links)...\n");
     while (fscanf(arq_links, "%d %d", &orig, &dest) == 2) {
         Graph_insertEdge(g, orig, dest, NULL);
     }
     fclose(arq_links);
     
     Buscador_recalcularRanking(g);
-
-    // printf("[SUCESSO] Base de dados totalmente carregada no Grafo!\n");
 }
 
 void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome_arq_links) {
@@ -100,16 +111,14 @@ void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome
     Vertex *v = g->first;
     while (v) {
         Site *s = (Site *)v->value;
-        // Salva: ID URL Nome
-        fprintf(f_sites, "%d %s %s", v->label, s->url, s->nome);
+        // Salva: ID URL Nome Peso
+        fprintf(f_sites, "%d %s %s %g", v->label, s->url, s->nome, s->peso);
         
-        // Salva as palavras na mesma linha
         for (int i = 0; i < s->qtd_palavras; i++) {
             fprintf(f_sites, " %s", s->palavras[i]);
         }
         fprintf(f_sites, "\n");
 
-        // Salva as arestas (links) deste vértice
         Edge *e = v->first;
         while (e) {
             if (e->head) {
@@ -124,7 +133,7 @@ void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome
     fclose(f_links);
 }
 
-void Buscador_cadastrarSite(Graph *g, int id, const char *url, const char *nome) {
+void Buscador_cadastrarSite(Graph *g, IndiceInvertido *ind, int id, const char *url, const char *nome, double peso) {
     Site *novo_site = (Site *)malloc(sizeof(Site));
     if (!novo_site) {
         printf("[ERRO] Falta de memoria ao cadastrar site.\n");
@@ -136,8 +145,24 @@ void Buscador_cadastrarSite(Graph *g, int id, const char *url, const char *nome)
     novo_site->importancia = 1.0; 
     novo_site->palavras = NULL;  
     novo_site->qtd_palavras = 0; 
-
+    novo_site->peso = peso;
     Graph_insertVertex(g, id, novo_site);
+
+    Vertex *v_site = Graph_findVertexByLabel(g, id);
+
+    // Indexa o nome e a URL no cadastro dinâmico
+    if (ind && v_site) {
+        char termo_nome[100], termo_url[150];
+        strcpy(termo_nome, nome);
+        strcpy(termo_url, url);
+
+        string_para_minusculo(termo_nome);
+        string_para_minusculo(termo_url);
+
+        Indice_inserirPalavra(ind, termo_nome, v_site);
+        Indice_inserirPalavra(ind, termo_url, v_site);
+    }
+
     Buscador_recalcularRanking(g);
 }
 

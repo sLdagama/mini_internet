@@ -22,6 +22,7 @@ typedef enum Say{
     Say_NAMEsite  = 5,
     Say_keyWord   = 6,
     Say_search    = 7,
+    Say_PESOsite  = 8,
 }Say;
 
 // Imprime a arte da interface inicial

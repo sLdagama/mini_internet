@@ -9,7 +9,8 @@
 int main(){
     int option, verify;
     int id_origem, id_destino, id_site;
-    char userAnswer[1000], userAnswer2[1000];
+    double peso;
+    char userAnswer[1000], userAnswer2[1000], userAnswer3[1000];
     Graph *grafo = Graph_alloc();
     IndiceInvertido *indice = Indice_alloc();
  
@@ -31,11 +32,13 @@ int main(){
         option = Style_showMenu();
         if(option == 1){
             //CADASTRAR SITE
-
-            Style_input(option * NOT_FINISHED, &id_site, Say_IDsite);
             Style_input(option * NOT_FINISHED, userAnswer, Say_URLsite);
-            Style_input(option, userAnswer2, Say_NAMEsite);
-            Buscador_cadastrarSite(grafo, id_site, userAnswer, userAnswer2);
+            Style_input(option * NOT_FINISHED, userAnswer2, Say_NAMEsite);
+            Style_input(option, &peso, Say_PESOsite);
+            
+
+            int id_site = Buscador_gerarProximoID(grafo);
+            Buscador_cadastrarSite(grafo, indice, id_site, userAnswer, userAnswer2, peso);
         } else if(option == 2){
             //CADASTRAR PALAVRA-CHAVE
 
