@@ -41,7 +41,7 @@ typedef struct {
 IndiceInvertido *Indice_alloc();
 
 //Associa uma palavra a um determinado site do grafo
-void Indice_inserirPalavra(IndiceInvertido *ind, char *palavra, Vertex *v);
+void Indice_inserirPalavra(IndiceInvertido *ind, const char *palavra, Vertex *v);
 
 //Remove as referências de um determinado site no índice (útil quando Samuel for remover um site)
 void Indice_removerReferenciasVertice(IndiceInvertido *ind, Vertex *v);

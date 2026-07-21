@@ -14,40 +14,45 @@ IndiceInvertido *Indice_alloc() {
 }
 
 
-void Indice_inserirPalavra(IndiceInvertido *ind, char *palavra, Vertex *v) {
+void Indice_inserirPalavra(IndiceInvertido *ind, const char *palavra, Vertex *v) {
     if (!ind || !palavra || !v) return;
 
+    
+    char palavra_min[150];
+    strncpy(palavra_min, palavra, sizeof(palavra_min) - 1);
+    palavra_min[sizeof(palavra_min) - 1] = '\0';
+    
+    //Converte a cópia para minúsculo
+    string_para_minusculo(palavra_min);
+
     WordNode *atualWord = ind->first;
-    WordNode *anteriorWord = NULL;
     int encontrou = 0;
 
+    // Busca a palavra no Índice
     while (atualWord) {
-        if (strcmp(atualWord->palavra, palavra) == 0) {
+        if (strcmp(atualWord->palavra, palavra_min) == 0) {
             encontrou = 1;
-            break; //Achou a palavra
+            break; // Achou a palavra
         }
-        anteriorWord = atualWord;
         atualWord = atualWord->next;
     }
 
-    
+    //Se não encontrou, cria um novo nó de palavra
     if (!encontrou) {
-        atualWord = malloc(sizeof(WordNode));
+        atualWord = (WordNode *)malloc(sizeof(WordNode));
         if (!atualWord) return;
 
-        strcpy(atualWord->palavra, palavra);
+        strcpy(atualWord->palavra, palavra_min);
         atualWord->sites_first = NULL;
         atualWord->qtd_sites = 0;
-        atualWord->next = NULL;
 
-        //Inserir a palavra no início do indice invertido
+
         atualWord->next = ind->first;
         ind->first = atualWord;
         ind->qtd_palavras++;
     }
 
-
-    // Verificar se o site já está registrado para esta palavra
+    // Verificar se o site já está registrado para esta palavra (evita duplicatas)
     OcorrenciaNode *verificar = atualWord->sites_first;
     int ja_existe = 0;
     while (verificar) {
@@ -58,15 +63,16 @@ void Indice_inserirPalavra(IndiceInvertido *ind, char *palavra, Vertex *v) {
         verificar = verificar->next;
     }
 
+    // Se o site ainda não aponta pra essa palavra, insere a ocorrência
     if (!ja_existe) {
-        OcorrenciaNode *novaOcorrencia = malloc(sizeof(OcorrenciaNode));
+        OcorrenciaNode *novaOcorrencia = (OcorrenciaNode *)malloc(sizeof(OcorrenciaNode));
         if (!novaOcorrencia) return;
+        
         novaOcorrencia->vertex = v; 
         novaOcorrencia->next = atualWord->sites_first;
         atualWord->sites_first = novaOcorrencia;
         atualWord->qtd_sites++;
     }
-
 }
 
 void Indice_removerReferenciasVertice(IndiceInvertido *ind, Vertex *v) {

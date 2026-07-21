@@ -167,24 +167,38 @@ void Buscador_cadastrarSite(Graph *g, IndiceInvertido *ind, int id, const char *
 }
 
 void Buscador_cadastrarPalavra(Graph *g, IndiceInvertido *ind, int id_site, const char *palavra) {
+    if (!palavra) return;
+
     Vertex *v_site = Graph_findVertexByLabel(g, id_site);
     if (!v_site) {
         printf("[ERRO] Site ID %d nao encontrado.\n", id_site);
         return;
     }
 
-    Site *site = (Site *)v_site->value;
-    
-    // Aumenta o array de palavras
-    site->palavras = realloc(site->palavras, (site->qtd_palavras + 1) * sizeof(char *));
-    site->palavras[site->qtd_palavras] = malloc(strlen(palavra) + 1);
-    strcpy(site->palavras[site->qtd_palavras], palavra);
-    
-    site->qtd_palavras++; 
+    //Cria uma cópia local tratada em minúsculo
+    char palavra_min[150];
+    strncpy(palavra_min, palavra, sizeof(palavra_min) - 1);
+    palavra_min[sizeof(palavra_min) - 1] = '\0';
+    string_para_minusculo(palavra_min);
 
-    // Insere no índice invertido para a busca funcionar
+    Site *site = (Site *)v_site->value;
+
+    //Aumenta o array e salva a palavra no site
+    char **temp = realloc(site->palavras, (site->qtd_palavras + 1) * sizeof(char *));
+    if (!temp) {
+        printf("[ERRO] Falha de memoria ao cadastrar palavra.\n");
+        return;
+    }
+    site->palavras = temp;
+
+    site->palavras[site->qtd_palavras] = malloc(strlen(palavra_min) + 1);
+    if (site->palavras[site->qtd_palavras]) {
+        strcpy(site->palavras[site->qtd_palavras], palavra_min);
+        site->qtd_palavras++;
+    }
+
     if (ind) {
-        Indice_inserirPalavra(ind, (char *)palavra, v_site);
+        Indice_inserirPalavra(ind, palavra_min, v_site);
     }
 }
 
