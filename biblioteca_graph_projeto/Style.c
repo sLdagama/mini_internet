@@ -97,6 +97,8 @@ void Style_underInput(State State){
     char text2[] = "Operação realizada com sucesso!";
     char text3[] = "Encaminhando para uma outra tela...";
     char text4[] = "Entrada inválida";
+    char text5[] = "Link já existente";
+    char text6[] = "Link não existente";
 
     h = Clic_getScreenHeight();
     h_textUP = h*0.7 + 5;
@@ -108,6 +110,11 @@ void Style_underInput(State State){
         Style_formatUnder(h_textUP, Color_YELLOW, text1);
     } else if (State == SUCCESS){
         Style_formatUnder(h_textDOWN, Color_GREEN, text2);
+    } else if (State == ERROR_LINK){
+        Style_formatUnder(h_textUP, Color_RED, text5);
+    }
+    else if (State == ERROR_LINK2){
+        Style_formatUnder(h_textUP, Color_RED, text6);
     } else {
         Style_formatUnder(h_textDOWN, Color_YELLOW, text3);
     }

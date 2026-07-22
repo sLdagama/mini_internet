@@ -133,16 +133,25 @@ void Buscador_salvarDados(Graph *g, const char *nome_arq_sites, const char *nome
     fclose(f_links);
 }
 
-void Buscador_cadastrarSite(Graph *g, IndiceInvertido *ind, int id, const char *url, const char *nome, double peso) {
+int Buscador_cadastrarSite(Graph *g, IndiceInvertido *ind, int id, const char *url, const char *nome, double peso) {
+    if (!g || !url || strlen(url) == 0 || peso < 1.0) {
+        return 0;
+    }
+
+    // Verifica se já existe um site com essa mesma URL
+    if (Graph_findVertexByValue(g, (void *)url, cmp_url) != NULL) {
+        return 0; 
+    }
+    
     Site *novo_site = (Site *)malloc(sizeof(Site));
     if (!novo_site) {
         printf("[ERRO] Falta de memoria ao cadastrar site.\n");
-        return;
+        return 0;
     }
 
     strcpy(novo_site->url, url);
     strcpy(novo_site->nome, nome);
-    novo_site->importancia = 1.0; 
+    novo_site->importancia = 0.0; 
     novo_site->palavras = NULL;  
     novo_site->qtd_palavras = 0; 
     novo_site->peso = peso;
@@ -164,6 +173,7 @@ void Buscador_cadastrarSite(Graph *g, IndiceInvertido *ind, int id, const char *
     }
 
     Buscador_recalcularRanking(g);
+    return 1;
 }
 
 void Buscador_cadastrarPalavra(Graph *g, IndiceInvertido *ind, int id_site, const char *palavra) {
@@ -202,20 +212,49 @@ void Buscador_cadastrarPalavra(Graph *g, IndiceInvertido *ind, int id_site, cons
     }
 }
 
-void Buscador_cadastrarLink(Graph *g, int id_origem, int id_destino) {
+int Buscador_cadastrarLink(Graph *g, int id_origem, int id_destino) {
+    if (!g) return 0;
+
+    Vertex *v_origem = Graph_findVertexByLabel(g, id_origem);
+    Vertex *v_destino = Graph_findVertexByLabel(g, id_destino);
+
+    if (!v_origem || !v_destino) {
+        return 0; //ids inválidos
+    }
+
+    // Verifica se o link já existe no Grafo
+    Edge *e = v_origem->first;
+    while (e) {
+        if (e->head == v_destino) {
+            return 0;
+        }
+        e = e->next;
+    }
+
+    //Se não existir, insere e recalcula
     Graph_insertEdge(g, id_origem, id_destino, NULL);
-    Buscador_recalcularRanking(g); 
+    Buscador_recalcularRanking(g);
+    
+    return 1; // 
 }
 
-void Buscador_removerLink(Graph *g, int id_origem, int id_destino) {
+int Buscador_removerLink(Graph *g, int id_origem, int id_destino) {
+    if (!g) return 0;
+
     Vertex *v_origem = Graph_findVertexByLabel(g, id_origem);
+    
     if (v_origem) {
         Edge *aresta_removida = Graph_removeEdge(v_origem, id_destino);
+        
+        //a aresta existia e foi removida:
         if (aresta_removida) {
             free(aresta_removida);
             Buscador_recalcularRanking(g); 
+            return 1; 
         }
     }
+
+    return 0; 
 }
 
 void Buscador_removerSite(Graph *g, IndiceInvertido *ind, int id_site) {

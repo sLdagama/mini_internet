@@ -40,10 +40,11 @@ int main(){
             Style_input(userAnswer2, Say_NAMEsite);
             Style_input(&peso, Say_PESOsite);
 
-            Style_underInput(WAIT);
-            Style_underInput(SUCCESS);
-
-            Buscador_cadastrarSite(grafo, indice, NEXTid, userAnswer, userAnswer2, peso);
+            if (Buscador_cadastrarSite(grafo, indice, NEXTid, userAnswer, userAnswer2, peso)) {
+                Style_underInput(SUCCESS);
+            } else {
+                Style_underInput(ERROR); 
+            }
         } else if(option == 2){
             //CADASTRAR PALAVRA-CHAVE
 
@@ -73,9 +74,12 @@ int main(){
                     Style_underInput(ERROR);
                 } else {
                     Style_underInput(WAIT);
-                    Style_underInput(SUCCESS);
-                    
-                    Buscador_cadastrarLink(grafo, id_origem, id_destino);
+
+                    if (Buscador_cadastrarLink(grafo, id_origem, id_destino)) {
+                        Style_underInput(SUCCESS);
+                    } else {
+                        Style_underInput(ERROR_LINK);
+                    }
                 }
             }
         } else if(option == 4){
@@ -105,9 +109,11 @@ int main(){
                     Style_underInput(ERROR);
                 } else {
                     Style_underInput(WAIT);
-                    Style_underInput(SUCCESS);
-                    
-                    Buscador_removerLink(grafo, id_origem, id_destino);
+                    if (Buscador_removerLink(grafo, id_origem, id_destino)) {
+                        Style_underInput(SUCCESS);
+                    } else {
+                        Style_underInput(ERROR_LINK2); 
+                    }
                 }
             }
         } else if(option == 6){
