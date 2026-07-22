@@ -29,6 +29,8 @@ typedef enum State {
     WAIT = 1,
     SUCCESS = 2,
     OTHER_SCREEN = 3,
+    ERROR_LINK = 4,
+    ERROR_LINK2 = 5,
 }State;
 
 // Verifica se o id é válido
