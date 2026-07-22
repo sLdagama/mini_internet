@@ -47,7 +47,7 @@ void Style_animationText(char **text, int times, int state){
     if(text){
         Clic_clearScreen();
 
-        if(state == FINISHED){
+        if(state == OKAY){
             //BORDAS VERDES AO CONCLUIR/FINALIZAR PROCESSO
 
             Clic_setFontColor(Color_GREEN);
@@ -71,6 +71,48 @@ void Style_canProceed(){
     printf("\nPressione qualquer tecla para retornar");
     Clic_keyCapture();
     Clic_hideCursor();
+}
+
+// Função auxiliar da função Style_underInput
+void Style_formatUnder(int h, Color Color, char *text){
+    Clic_move(h, 6);
+    Clic_setFontColor(Color);
+    Clic_printCenter(text);
+    Clic_pause(1.5);
+}
+
+int Style_idVerify(int NEXTid, int userAnswer){
+    int MAIORid = NEXTid - 1;
+
+    if((userAnswer > MAIORid)||(userAnswer < 0)){
+        return NOT_OKAY;
+    } else {
+        return OKAY;
+    }
+}
+
+void Style_underInput(State State){
+    int h, h_textUP, h_textDOWN;
+    char text1[] = "Aguarde...";
+    char text2[] = "Operação realizada com sucesso!";
+    char text3[] = "Encaminhando para uma outra tela...";
+    char text4[] = "Entrada inválida";
+
+    h = Clic_getScreenHeight();
+    h_textUP = h*0.7 + 5;
+    h_textDOWN = h_textUP + 1;
+
+    if(State == ERROR){
+        Style_formatUnder(h_textUP, Color_RED, text4);
+    } else if(State == WAIT){
+        Style_formatUnder(h_textUP, Color_YELLOW, text1);
+    } else if (State == SUCCESS){
+        Style_formatUnder(h_textDOWN, Color_GREEN, text2);
+    } else {
+        Style_formatUnder(h_textDOWN, Color_YELLOW, text3);
+    }
+
+    Clic_resetColor();
 }
 
 void Style_interfaceInicial(){
@@ -100,8 +142,7 @@ int Style_showMenu(){
                                "Remover site            ",
                                "Remover link            ",
                                "Pesquisar               ",
-                               "Mostrar links           ",
-                               "Mostrar ranking         ",
+                               "Sites existentes        ",
                                "Sair e salvar           ",};
 
     /* Aqui está o menu propriamente dito, se a linha selecionada é uma
@@ -155,12 +196,9 @@ int Style_showMenu(){
     return linha;
 }
 
-void Style_input(int option, void *userAnswer, Say Say){
+void Style_input(void *userAnswer, Say Say){
     int w = Clic_getScreenWidth();
     int h = Clic_getScreenHeight();
-    char text1[] = "Aguarde...";
-    char text2[] = "Operação realizada com sucesso!";
-    char text3[] = "Encaminhando para uma outra tela...";
     char temporaryAnswer[1000];
     char *charAnswer = NULL;
     int *intAnswer = NULL;
@@ -187,7 +225,7 @@ void Style_input(int option, void *userAnswer, Say Say){
      * é uma variável do tipo float.
      */
     Clic_showCursor();
-    if(Say < 4) {
+    if((Say < 4)) {
         intAnswer = userAnswer; 
         scanf("%d", intAnswer);
     } else if (Say < 8){
@@ -199,34 +237,6 @@ void Style_input(int option, void *userAnswer, Say Say){
         scanf("%lf", doubleAnswer);
     }
     Clic_hideCursor();
-
-    /* Se "option" for negativo, não haverá retorno visual final
-     * (ideal para opções que exigem mais de uma entrada)
-     */  
-    if(option > 0){
-        // Retorno visual intermediário
-        Clic_setFontColor(Color_YELLOW);
-        Clic_move(h*0.7 + 5, 6);
-        Clic_pause(1.5);
-        Clic_printCenter(text1);
-
-        // Retorno visual final
-        Clic_move(h*0.7 + 6, 6);
-        Clic_pause(1.5);
-        if(option != SEARCH_OPTION){
-            Clic_setFontColor(Color_GREEN);
-            Clic_printCenter(text2);
-        } else {
-            /* Entende-se pela cor verde como "processo concluído", se a opção escolhida 
-             * for a opção "pesquisar", não haverá retorno visual de cor verde.
-             */ 
-
-            // Segundo retorno visual intermediário
-            Clic_setFontColor(Color_YELLOW);
-            Clic_printCenter(text3);
-        }
-        Clic_pause(1.5);
-    }
 
     // Ajustes finais necessários
     Clic_resetColor();
@@ -255,9 +265,9 @@ int Style_executionVerify(){
         Clic_resetColor();
         Clic_pause(1);
 
-        return 0;
+        return NOT_OKAY;
     } else {
-        return 1;
+        return OKAY;
     }
 }
 
@@ -273,36 +283,34 @@ void Style_startProgram(){
     char  *text3[1] = {"Base de dados totalmente carregada no Grafo!"};
 
     Clic_hideCursor();
-    Style_animationText(text1, 4, NOT_FINISHED);
-    Style_animationText(text2, 4, NOT_FINISHED);
-    Style_animationText(text3, 1, FINISHED);
+    Style_animationText(text1, 4, NOT_OKAY);
+    Style_animationText(text2, 4, NOT_OKAY);
+    Style_animationText(text3, 1, OKAY);
     Clic_showCursor();
 }
 
 void Style_showLinks(Graph *g){
     if(g){
-        Clic_clearScreen();
+        printf("\n");
         Graph_print(g);
         Style_canProceed();
     }
 }
 
-void Style_showRank(Graph *g) {
+void Style_showTable(Graph *g) {
     Vertex *v = g->first;
 
     Clic_clearScreen();
-    printf("\n[RANKING ATUAL DOS SITES]\n");
+    printf("\n[SITES EXISTENTES]\n");
     if (!v) {
         printf("  O grafo esta vazio!\n");
         return;
     }
     while (v) {
         Site *s = (Site *)v->value;
-        printf("  ID: %d | Site: %-15s | Importancia: %.2f\n", v->label, s->nome, s->importancia);
+        printf("  ID: %-4d | Site: %-15s | Somatório importancia: %-8.2f | Peso da aresta: %.2f\n", v->label, s->nome, s->importancia, s->peso);
         v = v->next;
     }
-
-    Style_canProceed();
 }
 
 void Style_searchResult(Graph *g, IndiceInvertido *ind, char *expressao) {
