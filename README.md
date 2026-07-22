@@ -14,13 +14,9 @@ O usuário pode:
 - Cadastrar um link;
 - Remover um site;
 - Remover um link;
-- Realizar uma consulta com uma ou mais palavras;
-- Realizar uma consulta usando operadores OR ou AND;
-- Sair e salvar.
-
-As demais funcionalidades não são obrigatórias, mas servem para demonstrar o funcionamento das demais, são elas:
-- Mostrar links;
-- Mostrar ranking.
+- Realizar uma consulta com: uma palavra, mais de uma palavra (com ou sem operadores lógicos, OR ou AND);
+- Sair e salvar;
+- Ver sites existentes e informações importantes (funcionalidade puramente demonstrativa).
 
 ## Como usar
 
