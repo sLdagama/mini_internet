@@ -238,8 +238,7 @@ void Style_input(void *userAnswer, Say Say){
     }
     Clic_hideCursor();
 
-    // Ajustes finais necessários
-    Clic_resetColor();
+    // Ajuste final necessário
     Style_cleanBuffer();
 }
 
