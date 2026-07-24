@@ -1,3 +1,10 @@
+/*
+ * Projeto desenvolvido por:
+ * Carlos Henrique Gomes Araújo
+ * João Victor Rodrigues da Silva
+ * Samuel Lucas Alves dos Santos
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
